@@ -1612,14 +1612,24 @@
     if (!/^https?:$/.test(location.protocol)) return; // file:// 에서는 apple-touch-icon으로 충분
     try {
       const icon = document.querySelector('link[rel="apple-touch-icon"]').getAttribute('href');
+      // 홈 화면에 추가하면 브라우저는 현재 주소가 아니라 manifest의 start_url로 연다.
+      // 파라미터를 빼면 위젯 주소로 추가해도 전체 화면이 열리므로 검색문자열까지 넣는다.
+      const attr = document.documentElement.getAttribute('data-theme');
+      const dark = attr === 'dark' ||
+        (!attr && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      const bg = dark ? '#141413' : '#f0eee6';
+      // 휴가용·전역용을 각각 홈 화면에 두면 이름이 같아 구분이 안 되므로 갈라준다
+      const named = FOCUS === 'discharge'
+        ? { name: '전역 D-Day', short_name: '전역' }
+        : { name: '말년휴가 대장', short_name: '말년휴가' };
       const manifest = {
-        name: '말년휴가 대장',
-        short_name: '말년휴가',
-        start_url: location.pathname,
+        name: named.name,
+        short_name: named.short_name,
+        start_url: location.pathname + location.search,
         scope: location.pathname,
         display: 'standalone',
-        background_color: '#f0eee6',
-        theme_color: '#f0eee6',
+        background_color: bg,
+        theme_color: bg,
         icons: [{ src: icon, sizes: '192x192', type: 'image/png', purpose: 'any' }],
       };
       const url = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
