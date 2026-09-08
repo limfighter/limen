@@ -59,6 +59,15 @@
     --round-5-bg: #dbe6e4; --round-5-fg: #3f6b6b;
 
     --gauge-track: rgba(0,0,0,0.08);
+
+    /* 모션 토큰 — duration은 200~500ms 권장 구간, easing은 GSAP류 감속 커브(power3.out)를
+       흉내낸 cubic-bezier. --accent-rgb는 클레이 토큰과 같은 색을 alpha 있게 쓰기 위한
+       채널값이다(라이트/다크 모두 --accent가 동일한 클레이라 테마별로 나누지 않는다). */
+    --ease-out: cubic-bezier(.16, 1, .3, 1);
+    --dur-fast: 150ms;
+    --dur-base: 300ms;
+    --dur-slow: 600ms;
+    --accent-rgb: 217, 119, 87;
   }
 
   /* 다크 팔레트 — 중첩 문법을 쓰지 않아 구형 브라우저(삼성 인터넷 포함)에서도 적용된다 */
@@ -846,6 +855,108 @@
   /* 배경화면 위에 얹히므로 얇은 그림자로 가독성을 확보한다 */
   body.bare-mode .compact-card,
   body.bare-mode .compact-card * { text-shadow: 0 1px 3px rgba(0,0,0,.3); }
+
+  /* ====================================================================
+     모션 — 입장(rise/pop) · 탭 전환 · 눌림 피드백 · D-Day 당일 연출
+     참고: 마이크로 인터랙션 200~500ms, 진입은 ease-out이 자연스럽다는
+     일반적인 모션 디자인 가이드라인 기준으로 duration/easing을 잡았다.
+     ==================================================================== */
+  @keyframes mlv-rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes mlv-pop {
+    from { opacity: 0; transform: scale(.92); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes mlv-pulse-num {
+    0%, 100% { text-shadow: 0 0 0 rgba(var(--accent-rgb), 0); }
+    50%      { text-shadow: 0 0 24px rgba(var(--accent-rgb), .6); }
+  }
+  @keyframes mlv-pulse-card {
+    0%, 100% { box-shadow: 0 0 0 rgba(var(--accent-rgb), 0); }
+    50%      { box-shadow: 0 0 40px rgba(var(--accent-rgb), .28); }
+  }
+
+  /* 새로 그려지는 카드류에 입장 애니메이션. innerHTML로 통째로 다시 그려지는
+     블록이라 매번 새 DOM 노드가 생기고, 그래서 재렌더할 때마다 자연스럽게
+     다시 재생된다 — 값을 바꿨을 때 "반영됐다"는 확인 피드백도 겸한다. */
+  .group, .cal-stat, .cal-month, .cal-schedule, .combat-card {
+    animation: mlv-rise var(--dur-slow) var(--ease-out) both;
+  }
+  .chip { animation: mlv-pop var(--dur-base) var(--ease-out) both; }
+
+  /* 대장 ↔ 달력 탭 전환 — display 전환 자체는 즉시 일어나지만(레이아웃 안정성 때문에
+     유지), 나타나는 쪽에 살짝 rise를 얹어 하드컷 대신 크로스페이드처럼 보이게 한다 */
+  .view.active { animation: mlv-rise var(--dur-slow) var(--ease-out) both; }
+
+  /* 회차 진행 세그먼트 — 순서대로 살짝 늦게 나타나며 차오른다 (stagger) */
+  .seg-track .seg { animation: mlv-pop var(--dur-base) var(--ease-out) both; }
+  .seg-track .seg:nth-child(1) { animation-delay: 0ms; }
+  .seg-track .seg:nth-child(2) { animation-delay: 60ms; }
+  .seg-track .seg:nth-child(3) { animation-delay: 120ms; }
+  .seg-track .seg:nth-child(4) { animation-delay: 180ms; }
+  .seg > i { transition: width var(--dur-slow) var(--ease-out); }
+
+  /* 버튼류 눌림 피드백 — 진짜 눌리는 느낌만 살짝, hover 아님(모바일 웹앱이라 hover는 의미가 적다) */
+  .qty button, .btn-clay, .btn-outline, .del, .reset-link, .view-tab, .cal-tab {
+    transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  }
+  .qty button:active, .btn-clay:active, .btn-outline:active, .cal-tab:active {
+    transform: scale(.94);
+  }
+
+  /* D-Day 당일 전용 연출 — 그날 하루만, JS가 .is-dday-today를 붙인다 */
+  .dday-num.is-dday-today { animation: mlv-pulse-num 2.2s ease-in-out infinite; }
+  .dday-card.is-dday-today, .service-card.is-dday-today { animation: mlv-pulse-card 2.2s ease-in-out infinite; }
+  .compact-num.is-dday-today { animation: mlv-pulse-num 2.2s ease-in-out infinite; }
+
+  /* 전투휴무증 총 보유 수 편집용 인라인 스테퍼 — 기존 .qty와 같은 언어 */
+  .combat-total-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .combat-total-edit button {
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    border-radius: var(--radius-sm, 8px);
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+    font-family: var(--font-sans);
+  }
+  .combat-total-edit button:active { transform: scale(.9); }
+  .combat-total-edit input {
+    width: 34px;
+    text-align: center;
+    border: none;
+    background: transparent;
+    color: var(--muted-strong);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    -moz-appearance: textfield;
+  }
+  .combat-total-edit input::-webkit-outer-spin-button,
+  .combat-total-edit input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .combat-total-edit input:focus { outline: none; color: var(--text); }
+
+  /* 접근성: 움직임을 줄이도록 설정한 사용자에게는 전부 즉시 반영으로 */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -884,7 +995,7 @@
 
   <div class="hero">
     <div>
-      <div class="hero-num" id="grandTotal">0<span>일</span></div>
+      <div class="hero-num"><span id="grandTotal">0</span><span>일</span></div>
       <div class="hero-meta" id="heroMeta"></div>
     </div>
     <div class="hero-breakdown" id="groupTotals"></div>
@@ -960,7 +1071,7 @@
   const ENLIST = new Date(2025, 5, 17);     // 입대 2025-06-17
   const DISCHARGE = new Date(2026, 11, 16); // 전역 2026-12-16
   const FIRST_ANCHOR = new Date(2026, 7, 31); // 1회차 게이지 기준 시작점 (8/31)
-  const COMBAT_TOTAL = 13;                  // 보유 전투휴무증
+  const COMBAT_TOTAL = 13;                  // 보유 전투휴무증 기본값 (사용자가 아래 combatTotal로 직접 고칠 수 있다)
 
   // 훈련 5개 구간 (커버 여부를 자동 집계하기 위해 구간 단위로 관리)
   const trainingBlocks = [
@@ -1004,6 +1115,40 @@
     return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
+  /* ---------- 모션: 숫자 카운트업 ----------
+     CSS만으로는 텍스트 노드 안의 숫자를 보간할 수 없어서(불투명도·위치 등만 가능)
+     requestAnimationFrame으로 직접 보간한다. 화면에 최종적으로 찍히는 값은
+     항상 render(to)와 동일하다 — 애니메이션은 그 값에 도달하는 과정만 꾸민다.
+     최초 렌더는 0에서 시작해 올라간다(카운트업 연출), 이후 값이 바뀔 때는
+     이전에 표시했던 값에서 이어서 움직인다. 같은 값으로 다시 그려질 때(예:
+     1분마다 도는 D-Day 갱신에서 날짜가 안 바뀐 경우)는 애니메이션을 건너뛴다. */
+  const REDUCE_MOTION = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const _animPrev = new WeakMap();
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+  function animateValue(el, to, render, duration) {
+    if (!el) return;
+    duration = duration || 700;
+    const from = _animPrev.has(el) ? _animPrev.get(el) : 0;
+    _animPrev.set(el, to);
+    if (REDUCE_MOTION || from === to) { el.textContent = render(to); return; }
+    const start = performance.now();
+    (function frame(now) {
+      const t = Math.min(1, (now - start) / duration);
+      const v = from + (to - from) * easeOutCubic(t);
+      el.textContent = render(t < 1 ? v : to);
+      if (t < 1) requestAnimationFrame(frame);
+    })(start);
+  }
+  /* D-Day류 텍스트(D-41 / D-DAY / D+3)는 부호에 따라 형식 자체가 달라져서
+     매 프레임 부호를 다시 판정하면 애니메이션 중간에 라벨이 깜빡인다.
+     그래서 라벨(D-/D-DAY/D+)은 최종값 기준으로 한 번만 정하고, 숫자 크기만 센다. */
+  function animateDday(el, diff, duration) {
+    if (!el) return;
+    if (diff === 0) { _animPrev.set(el, 0); el.textContent = 'D-DAY'; return; }
+    const label = diff > 0 ? 'D-' : 'D+';
+    animateValue(el, Math.abs(diff), v => label + Math.round(v), duration);
+  }
+
   /* ---------- 회차를 leaves에서 파생 (날짜를 따로 적지 않는다) ---------- */
   function deriveRounds(planId) {
     const leaves = plans[planId].leaves;
@@ -1033,8 +1178,9 @@
      1. 저장소 — 키를 기능별로 분리해서 하나가 깨져도 나머지가 살아남게 한다
      ===================================================================== */
   const LEDGER_KEY = 'leave-ledger-v2';   // 대장 (기본값 미변경이므로 버전 유지)
-  const COMBAT_KEY = 'mlv-combat-v1';     // 전투휴무증 사용 기록
-  const THEME_KEY  = 'mlv-theme-v1';      // 테마 선택값
+  const COMBAT_KEY = 'mlv-combat-v1';         // 전투휴무증 사용 기록
+  const COMBAT_TOTAL_KEY = 'mlv-combat-total-v1'; // 전투휴무증 보유 총 장수 (사용자 편집)
+  const THEME_KEY  = 'mlv-theme-v1';          // 테마 선택값
 
   function readStore(key, fallback) {
     try {
@@ -1150,7 +1296,7 @@
       '</div>';
     }).join('');
 
-    grandTotalEl.innerHTML = grand + '<span>일</span>';
+    animateValue(grandTotalEl, grand, v => Math.round(v), 700);
 
     groupTotalsEl.innerHTML = state.map(function (g) {
       const t = g.items.reduce((s, it) => s + (Number(it.qty) || 0), 0);
@@ -1236,6 +1382,16 @@
     return Array.isArray(v) ? v.filter(x => typeof x === 'string') : [];
   })());
   let recordMode = false;
+  // 보유 총 장수는 대장 항목들처럼 직접 편집 가능한 값이다 — 잔여는 항상
+  // 이 값에서 자동 계산되고(L1), 이 숫자 자체를 손으로 덮어쓰지는 않는다.
+  let combatTotal = (function () {
+    const v = readStore(COMBAT_TOTAL_KEY, COMBAT_TOTAL);
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 ? n : COMBAT_TOTAL;
+  })();
+  function saveCombatTotal() {
+    writeStore(COMBAT_TOTAL_KEY, combatTotal);
+  }
 
   function combatUsedSet() {
     const s = new Set(plans[ACTIVE_PLAN].combatSet);
@@ -1249,8 +1405,8 @@
     if (userCombat.has(key)) {
       userCombat.delete(key);
     } else {
-      if (combatUsedSet().size >= COMBAT_TOTAL) {
-        alert('전투휴무증은 ' + COMBAT_TOTAL + '장까지입니다. 기존 기록을 지운 뒤 추가하세요.');
+      if (combatUsedSet().size >= combatTotal) {
+        alert('전투휴무증은 ' + combatTotal + '장까지입니다. 보유 장수를 늘리거나 기존 기록을 지운 뒤 추가하세요.');
         return;
       }
       userCombat.add(key);
@@ -1261,8 +1417,8 @@
 
   function renderCombatCard() {
     const used = combatUsedSet();
-    const left = COMBAT_TOTAL - used.size;
-    const pct = Math.round((used.size / COMBAT_TOTAL) * 100);
+    const left = combatTotal - used.size; // 음수가 될 수 있다(기록이 보유 장수보다 많을 때) — 그대로 보여준다, 감추지 않는다
+    const pct = combatTotal > 0 ? Math.max(0, Math.min(100, Math.round((used.size / combatTotal) * 100))) : 100;
     const sorted = Array.from(used).sort((a, b) => keyToDate(a) - keyToDate(b));
 
     const chips = sorted.length
@@ -1278,19 +1434,42 @@
       '<div class="combat-card">' +
         '<div class="combat-head">' +
           '<div class="combat-title">전투휴무증</div>' +
-          '<div class="combat-count"><b>잔여 ' + left + '장</b> / ' + COMBAT_TOTAL + '장</div>' +
+          '<div class="combat-count">잔여 <b id="combatLeftNum">0</b>장 / ' +
+            '<span class="combat-total-edit">' +
+              '<button data-total="dec" title="보유 장수 줄이기">−</button>' +
+              '<input type="number" id="combatTotalInput" min="0" value="' + combatTotal + '">' +
+              '<button data-total="inc" title="보유 장수 늘리기">+</button>' +
+            '</span>장' +
+          '</div>' +
         '</div>' +
         '<div class="dday-gauge-track"><div class="dday-gauge-fill" style="width:' + pct + '%"></div></div>' +
-        '<p class="combat-note">확정 일정은 전투휴무증 0장 기준입니다. 실제로 쓴 날을 여기에 기록하면 잔여 장수가 자동으로 줄어듭니다.' +
+        '<p class="combat-note">보유 장수는 위 숫자를 직접 편집할 수 있습니다. 확정 일정은 전투휴무증 0장 기준이고,' +
+          ' 실제로 쓴 날을 달력에 기록하면 잔여 장수가 자동으로 줄어듭니다.' +
           (recordMode ? ' <b>달력에서 날짜를 눌러 기록하세요.</b>' : '') + '</p>' +
         '<button class="btn-outline' + (recordMode ? ' on' : '') + '" id="recordBtn">' +
           (recordMode ? '기록 모드 끄기' : '기록 모드 켜기') + '</button>' +
         '<div class="combat-chips" style="margin-top:12px">' + chips + '</div>' +
       '</div>';
 
+    animateValue(document.getElementById('combatLeftNum'), left, v => Math.round(v), 700);
+
     document.getElementById('recordBtn').addEventListener('click', function () {
       recordMode = !recordMode;
       document.body.classList.toggle('record-mode', recordMode);
+      renderCalendar();
+    });
+    document.querySelectorAll('#combatCard [data-total]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        combatTotal = Math.max(0, combatTotal + (btn.dataset.total === 'inc' ? 1 : -1));
+        saveCombatTotal();
+        renderCalendar();
+      });
+    });
+    document.getElementById('combatTotalInput').addEventListener('change', function (e) {
+      let v = parseInt(e.target.value, 10);
+      if (isNaN(v) || v < 0) v = 0;
+      combatTotal = v;
+      saveCombatTotal();
       renderCalendar();
     });
     document.querySelectorAll('#combatCard [data-remove]').forEach(function (btn) {
@@ -1324,7 +1503,7 @@
     let html = '<div class="cal-summary">' +
       '<div class="cal-stat"><div class="cal-stat-num">' + totalDays + '일</div><div class="cal-stat-label">총 소진</div></div>' +
       '<div class="cal-stat"><div class="cal-stat-num">' + roundCount + '회차</div><div class="cal-stat-label">휴가 횟수</div></div>' +
-      '<div class="cal-stat"><div class="cal-stat-num">' + combatUsed.size + '장</div><div class="cal-stat-label">전투휴무증 (잔여 ' + (COMBAT_TOTAL - combatUsed.size) + ')</div></div>' +
+      '<div class="cal-stat"><div class="cal-stat-num">' + combatUsed.size + '장</div><div class="cal-stat-label">전투휴무증 (잔여 ' + (combatTotal - combatUsed.size) + ')</div></div>' +
       '<div class="cal-stat"><div class="cal-stat-num">' + coveredCount + '/' + trainingBlocks.length + '</div><div class="cal-stat-label">훈련커버</div></div>' +
     '</div>';
 
@@ -1457,8 +1636,12 @@
     const pct = gauge(s.from, s.target);
 
     document.getElementById('ddayLabel').textContent = s.label;
-    document.getElementById('ddayNum').textContent = ddayText(diff);
+    const ddayNumEl = document.getElementById('ddayNum');
+    animateDday(ddayNumEl, diff);
     document.getElementById('ddayFill').style.width = pct + '%';
+    // D-Day 당일 하루만 카드/숫자에 은은한 글로우를 준다 (휴가 시작·복귀·전역 전부 해당)
+    ddayNumEl.classList.toggle('is-dday-today', diff === 0);
+    document.getElementById('ddayCard').classList.toggle('is-dday-today', diff === 0);
 
     let caption;
     if (s.kind === 'during') {
@@ -1478,8 +1661,11 @@
     const svcDone = Math.min(svcTotal, Math.max(0, dayDiff(ENLIST, t)));
     const svcPct = svcTotal > 0 ? (svcDone / svcTotal) * 100 : 100;
     const svcDiff = dayDiff(t, DISCHARGE);
-    document.getElementById('svcNum').textContent = ddayText(svcDiff);
+    const svcNumEl = document.getElementById('svcNum');
+    animateDday(svcNumEl, svcDiff);
     document.getElementById('svcFill').style.width = svcPct + '%';
+    svcNumEl.classList.toggle('is-dday-today', svcDiff === 0);
+    document.getElementById('serviceCard').classList.toggle('is-dday-today', svcDiff === 0);
     document.getElementById('svcCaption').textContent =
       '복무 ' + (svcDone + 1) + '일차 / 총 ' + (svcTotal + 1) + '일 · ' + svcPct.toFixed(1) + '%' +
       ' · 입대 ' + fmt(ENLIST);
@@ -1533,38 +1719,44 @@
     }).join('');
 
     // 큰 숫자를 무엇으로 볼지는 ?focus= 로 고른다
-    let label, num, fill, sub, cells;
+    const cpNumEl = document.getElementById('cpNum');
+    let label, numDiff, fill, sub, cell1Days, cell2, cell2Label, cell3, cell3Label;
     if (FOCUS === 'discharge') {
       label = '전역까지';
-      num = ddayText(svcDiff);
+      numDiff = svcDiff;
       fill = svcPct;
       sub = '복무 ' + (svcDone + 1) + '일차 / 총 ' + (svcTotal + 1) + '일 · ' + svcPct.toFixed(1) + '%';
-      cells = [
-        [left + '일', '잔여 휴가'],
-        [ddayText(diff), s.kind === 'during' ? '복귀' : '다음 휴가'],
-        [doneRounds + '/' + rounds.length, '회차 종료'],
-      ];
+      cell1Days = left;
+      cell2 = diff; cell2Label = s.kind === 'during' ? '복귀' : '다음 휴가'; // D-Day류라 카운트업
+      cell3 = doneRounds + '/' + rounds.length; cell3Label = '회차 종료'; // 분수는 그대로 표시(카운트업 대상 아님)
     } else {
       label = s.label;
-      num = ddayText(diff);
+      numDiff = diff;
       fill = pct;
       sub = caption;
-      cells = [
-        [left + '일', '잔여 휴가'],
-        [ddayText(svcDiff), '전역'],
-        [Math.round(svcPct) + '%', '복무 진행'],
-      ];
+      cell1Days = left;
+      cell2 = svcDiff; cell2Label = '전역';
+      cell3 = Math.round(svcPct); cell3Label = '복무 진행';
     }
 
     document.getElementById('cpLabel').textContent = label;
-    document.getElementById('cpNum').textContent = num;
+    animateDday(cpNumEl, numDiff);
+    cpNumEl.classList.toggle('is-dday-today', numDiff === 0);
+    document.getElementById('cpCard').classList.toggle('is-dday-today', numDiff === 0);
     document.getElementById('cpFill').style.width = fill + '%';
     document.getElementById('cpSub').textContent = sub;
     document.getElementById('cpNext').textContent = nextLine(s);
-    cells.forEach(function (c, i) {
-      document.getElementById('cpC' + (i + 1)).textContent = c[0];
-      document.getElementById('cpL' + (i + 1)).textContent = c[1];
-    });
+
+    animateValue(document.getElementById('cpC1'), cell1Days, v => Math.round(v) + '일', 700);
+    document.getElementById('cpL1').textContent = '잔여 휴가';
+    animateDday(document.getElementById('cpC2'), cell2, 700);
+    document.getElementById('cpL2').textContent = cell2Label;
+    if (FOCUS === 'discharge') {
+      document.getElementById('cpC3').textContent = cell3; // 분수 표시는 즉시
+    } else {
+      animateValue(document.getElementById('cpC3'), cell3, v => Math.round(v) + '%', 700);
+    }
+    document.getElementById('cpL3').textContent = cell3Label;
   }
 
   /* =====================================================================
