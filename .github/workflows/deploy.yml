@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '**.html'
+      - 'functions/**'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
