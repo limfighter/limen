@@ -16,7 +16,10 @@
 <script>
   /* 테마 선택값을 페인트 전에 적용 — 새로고침 때 화면이 번쩍이지 않게 */
   try {
-    var t = JSON.parse(localStorage.getItem('mlv-theme-v1') || '"system"');
+    var q = new URLSearchParams(location.search).get('theme');
+    var t = (q === 'dark' || q === 'light')
+      ? q
+      : JSON.parse(localStorage.getItem('mlv-theme-v1') || '"system"');
     if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
   } catch (e) {}
 </script>
@@ -747,6 +750,102 @@
     color: var(--muted);
     text-decoration: underline;
   }
+  .compact-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .compact-next { margin-top: 4px; font-size: 12px; color: var(--muted-strong); }
+  .state-tag {
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--color-ivory-light);
+  }
+  .state-tag[hidden] { display: none; }
+
+  /* 회차 진행 세그먼트 — 폭은 회차 일수에 비례 */
+  .seg-track { display: flex; gap: 3px; margin-top: 6px; }
+  .seg { height: 6px; border-radius: 3px; background: var(--gauge-track); overflow: hidden; }
+  .seg > i { display: block; height: 100%; background: var(--accent); border-radius: 3px; transition: width .4s ease; }
+  .seg-labels { display: flex; gap: 3px; margin-top: 3px; }
+  .seg-label { text-align: center; font-size: 10px; color: var(--muted); }
+  .seg-label.on { color: var(--accent-deep); font-weight: 700; }
+
+  /* 상태별 색 반전 — 휴가 중 / 전역 임박 */
+  .compact-card.st-during { background: var(--accent); color: var(--color-ivory-light); }
+  .compact-card.st-during .compact-num { color: var(--color-ivory-light); }
+  .compact-card.st-during .compact-label,
+  .compact-card.st-during .compact-sub,
+  .compact-card.st-during .compact-next,
+  .compact-card.st-during .seg-label { color: rgba(255,255,255,.8); }
+  .compact-card.st-during .seg-label.on { color: var(--color-ivory-light); }
+  .compact-card.st-during .state-tag { background: rgba(255,255,255,.24); color: var(--color-ivory-light); }
+  .compact-card.st-during .dday-gauge-track,
+  .compact-card.st-during .seg { background: rgba(255,255,255,.28); }
+  .compact-card.st-during .dday-gauge-fill,
+  .compact-card.st-during .seg > i { background: var(--color-ivory-light); }
+  .compact-card.st-during .compact-cell {
+    background: rgba(255,255,255,.16);
+    border-color: rgba(255,255,255,.22);
+    color: var(--color-ivory-light);
+  }
+  .compact-card.st-during .compact-cell .l { color: rgba(255,255,255,.75); }
+
+  .compact-card.st-final { background: var(--color-slate-dark); color: var(--color-ivory-light); }
+  .compact-card.st-final .compact-num { color: var(--accent); }
+  .compact-card.st-final .compact-label,
+  .compact-card.st-final .compact-sub,
+  .compact-card.st-final .compact-next,
+  .compact-card.st-final .seg-label { color: rgba(255,255,255,.7); }
+  .compact-card.st-final .seg-label.on { color: var(--accent); }
+  .compact-card.st-final .dday-gauge-track,
+  .compact-card.st-final .seg { background: rgba(255,255,255,.2); }
+  .compact-card.st-final .compact-cell {
+    background: rgba(255,255,255,.1);
+    border-color: rgba(255,255,255,.18);
+    color: var(--color-ivory-light);
+  }
+  .compact-card.st-final .compact-cell .l { color: rgba(255,255,255,.66); }
+
+  /* 위젯 전용 베어 모드 — 배경을 비우고 글자만 남긴다 */
+  body.bare-mode { background: transparent; }
+  body.bare-mode .wrap { max-width: none; padding: 0; }
+  body.bare-mode .compact-card { background: transparent; padding: 0; }
+  body.bare-mode .compact-card.st-during .compact-num,
+  body.bare-mode .compact-card.st-final .compact-num { color: var(--accent-deep); }
+  body.bare-mode .compact-card.st-during,
+  body.bare-mode .compact-card.st-final { color: var(--text); }
+  body.bare-mode .compact-card.st-during .compact-label,
+  body.bare-mode .compact-card.st-during .compact-sub,
+  body.bare-mode .compact-card.st-during .compact-next,
+  body.bare-mode .compact-card.st-final .compact-label,
+  body.bare-mode .compact-card.st-final .compact-sub,
+  body.bare-mode .compact-card.st-final .compact-next { color: var(--muted-strong); }
+  body.bare-mode .compact-card.st-during .dday-gauge-track,
+  body.bare-mode .compact-card.st-final .dday-gauge-track,
+  body.bare-mode .compact-card.st-during .seg,
+  body.bare-mode .compact-card.st-final .seg { background: var(--gauge-track); }
+  body.bare-mode .compact-card.st-during .dday-gauge-fill,
+  body.bare-mode .compact-card.st-during .seg > i { background: var(--accent); }
+  body.bare-mode .compact-num { font-size: 76px; }
+  body.bare-mode .compact-cell {
+    background: transparent;
+    border: none;
+    padding: 8px 2px 0;
+  }
+  body.bare-mode .compact-card.st-during .compact-cell,
+  body.bare-mode .compact-card.st-final .compact-cell { background: transparent; color: var(--text); }
+  /* 베어 모드에서는 카드 배경이 사라지므로, 상태 배지가 유일한 상태 신호가 된다.
+     반투명 흰색 배지는 배경화면 위에서 묻히므로 액센트 배지로 바꾼다. */
+  body.bare-mode .compact-card.st-during .state-tag,
+  body.bare-mode .compact-card.st-final .state-tag {
+    background: var(--accent);
+    color: var(--color-ivory-light);
+  }
+  body.bare-mode .compact-exit { display: none; }
+  /* 배경화면 위에 얹히므로 얇은 그림자로 가독성을 확보한다 */
+  body.bare-mode .compact-card,
+  body.bare-mode .compact-card * { text-shadow: 0 1px 3px rgba(0,0,0,.3); }
 </style>
 </head>
 <body>
@@ -825,15 +924,21 @@
   </section>
 
   <section id="viewCompact">
-    <div class="compact-card">
-      <div class="compact-label" id="cpLabel">다음 휴가까지</div>
+    <div class="compact-card" id="cpCard">
+      <div class="compact-top">
+        <span class="compact-label" id="cpLabel">다음 휴가까지</span>
+        <span class="state-tag" id="cpTag" hidden></span>
+      </div>
       <div class="compact-num" id="cpNum">D-–</div>
       <div class="dday-gauge-track"><div class="dday-gauge-fill" id="cpFill" style="width:0%"></div></div>
+      <div class="seg-track" id="cpSegs"></div>
+      <div class="seg-labels" id="cpSegLabels"></div>
       <div class="compact-sub" id="cpSub"></div>
+      <div class="compact-next" id="cpNext"></div>
       <div class="compact-grid">
-        <div class="compact-cell"><div class="n" id="cpLeft">–</div><div class="l">잔여 휴가</div></div>
-        <div class="compact-cell"><div class="n" id="cpDischarge">–</div><div class="l">전역</div></div>
-        <div class="compact-cell"><div class="n" id="cpService">–</div><div class="l">복무 진행</div></div>
+        <div class="compact-cell"><div class="n" id="cpC1">–</div><div class="l" id="cpL1">잔여 휴가</div></div>
+        <div class="compact-cell"><div class="n" id="cpC2">–</div><div class="l" id="cpL2">전역</div></div>
+        <div class="compact-cell"><div class="n" id="cpC3">–</div><div class="l" id="cpL3">복무 진행</div></div>
       </div>
     </div>
     <a class="compact-exit" href="?">전체 화면 보기</a>
@@ -1379,16 +1484,87 @@
       '복무 ' + (svcDone + 1) + '일차 / 총 ' + (svcTotal + 1) + '일 · ' + svcPct.toFixed(1) + '%' +
       ' · 입대 ' + fmt(ENLIST);
 
-    // 컴팩트(위젯) 화면
+    updateCompact(s, t, diff, pct, caption, svcDiff, svcPct, svcDone, svcTotal);
+  }
+
+  /* ---------- 위젯(컴팩트) 화면 ---------- */
+  function nextLine(s) {
+    // 휴가가 다 끝난 뒤에는 윗줄(sub)이 이미 전역일을 말하므로, 큰 숫자가 전역이 아닌 한 비운다
+    if (s.kind === 'during') {
+      const i = rounds.findIndex(r => r.round === s.round.round);
+      const nx = rounds[i + 1];
+      // 복귀일은 바로 윗줄(sub)에 이미 있으므로 여기서는 그 다음 일정만 말한다
+      return nx
+        ? '다음 ' + nx.round + '회차 ' + fmt(nx.start) + '~' + fmt(nx.end) + ' · ' + nx.days + '일'
+        : '전역 ' + fmt(DISCHARGE);
+    }
+    if (s.kind === 'before') {
+      return '다음 ' + s.round.round + '회차 ' + fmt(s.round.start) + '~' + fmt(s.round.end) +
+        ' · ' + s.round.days + '일';
+    }
+    return FOCUS === 'discharge' ? '전역 ' + fmt(DISCHARGE) : '';
+  }
+
+  function updateCompact(s, t, diff, pct, caption, svcDiff, svcPct, svcDone, svcTotal) {
     const p = leaveProgress();
     const left = ledgerTotal() - p.used;
-    document.getElementById('cpLabel').textContent = s.label;
-    document.getElementById('cpNum').textContent = ddayText(diff);
-    document.getElementById('cpFill').style.width = pct + '%';
-    document.getElementById('cpSub').textContent = caption;
-    document.getElementById('cpLeft').textContent = left + '일';
-    document.getElementById('cpDischarge').textContent = ddayText(svcDiff);
-    document.getElementById('cpService').textContent = Math.round(svcPct) + '%';
+    const doneRounds = rounds.filter(r => t > r.end).length;
+
+    // 상태별 색 반전: 휴가 중이 전역 임박보다 우선
+    const card = document.getElementById('cpCard');
+    card.classList.remove('st-during', 'st-final');
+    let tag = '';
+    if (s.kind === 'during') { card.classList.add('st-during'); tag = '휴가 중'; }
+    else if (svcDiff <= 7) { card.classList.add('st-final'); tag = '전역 임박'; }
+    const tagEl = document.getElementById('cpTag');
+    tagEl.textContent = tag;
+    tagEl.hidden = !tag;
+
+    // 4회차 진행 세그먼트 — 폭은 회차 일수, 채움은 경과 일수 (전부 leaves 파생)
+    document.getElementById('cpSegs').innerHTML = rounds.map(function (r) {
+      const spent = Math.min(r.days, Math.max(0, dayDiff(r.start, t) + 1));
+      return '<div class="seg" style="flex-grow:' + r.days + '">' +
+        '<i style="width:' + ((spent / r.days) * 100) + '%"></i></div>';
+    }).join('');
+    document.getElementById('cpSegLabels').innerHTML = rounds.map(function (r) {
+      const on = s.round && s.round.round === r.round;
+      return '<div class="seg-label' + (on ? ' on' : '') + '" style="flex-grow:' + r.days + '">' +
+        r.round + '</div>';
+    }).join('');
+
+    // 큰 숫자를 무엇으로 볼지는 ?focus= 로 고른다
+    let label, num, fill, sub, cells;
+    if (FOCUS === 'discharge') {
+      label = '전역까지';
+      num = ddayText(svcDiff);
+      fill = svcPct;
+      sub = '복무 ' + (svcDone + 1) + '일차 / 총 ' + (svcTotal + 1) + '일 · ' + svcPct.toFixed(1) + '%';
+      cells = [
+        [left + '일', '잔여 휴가'],
+        [ddayText(diff), s.kind === 'during' ? '복귀' : '다음 휴가'],
+        [doneRounds + '/' + rounds.length, '회차 종료'],
+      ];
+    } else {
+      label = s.label;
+      num = ddayText(diff);
+      fill = pct;
+      sub = caption;
+      cells = [
+        [left + '일', '잔여 휴가'],
+        [ddayText(svcDiff), '전역'],
+        [Math.round(svcPct) + '%', '복무 진행'],
+      ];
+    }
+
+    document.getElementById('cpLabel').textContent = label;
+    document.getElementById('cpNum').textContent = num;
+    document.getElementById('cpFill').style.width = fill + '%';
+    document.getElementById('cpSub').textContent = sub;
+    document.getElementById('cpNext').textContent = nextLine(s);
+    cells.forEach(function (c, i) {
+      document.getElementById('cpC' + (i + 1)).textContent = c[0];
+      document.getElementById('cpL' + (i + 1)).textContent = c[1];
+    });
   }
 
   /* =====================================================================
@@ -1405,6 +1581,9 @@
     if (btn) showView(btn.dataset.view);
   });
 
+  /* ?theme= 로 강제된 테마는 위젯용이므로 저장값보다 우선한다 */
+  const THEME_PARAM = new URLSearchParams(location.search).get('theme');
+
   const THEMES = [
     { id: 'system', label: '시스템' },
     { id: 'light', label: '밝게' },
@@ -1414,8 +1593,9 @@
   if (!THEMES.some(x => x.id === themeId)) themeId = 'system';
 
   function applyTheme() {
-    if (themeId === 'system') document.documentElement.removeAttribute('data-theme');
-    else document.documentElement.setAttribute('data-theme', themeId);
+    const effective = (THEME_PARAM === 'dark' || THEME_PARAM === 'light') ? THEME_PARAM : themeId;
+    if (effective === 'system') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', effective);
     const cur = THEMES.find(x => x.id === themeId);
     document.getElementById('themeBtn').textContent = '테마: ' + cur.label;
   }
@@ -1453,8 +1633,11 @@
   /* =====================================================================
      7. 시작
      ===================================================================== */
-  if (new URLSearchParams(location.search).get('view') === 'compact') {
+  const PARAMS = new URLSearchParams(location.search);
+  const FOCUS = PARAMS.get('focus') === 'discharge' ? 'discharge' : 'leave';
+  if (PARAMS.get('view') === 'compact') {
     document.body.classList.add('compact-mode');
+    if (PARAMS.get('bare') === '1') document.body.classList.add('bare-mode');
   }
   applyTheme();
   renderLedger();
