@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>말년휴가 대장</title>
+<meta name="theme-color" content="#f0eee6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="말년휴가">
+<meta name="application-name" content="말년휴가">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAC5UlEQVR42u3dvUosMRiA4blLL8B7UBAbsbESC+0Eq61tbUQ7QdBGCwVFZbBwF1x/8LeJBFywFnYnme8pnhuYnTeZ5OTE5nJxLkFUjYeAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAFArwK43VxKo4Pd9D5q0/fXGzOQn3V+5vnZC6BD+UfwQnYr/wYC6MD49NALWIj8WwjAyG8mEMBsvvm9cGWqcU3QGP2JPAtUF4DdnrJ3hwQwZV60sglAAAIQgE8gn0ACsAi2CBaAbVDboAIwCxj9BeAohKMQAjATGPkF4Di049ACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAPQ4ANeixLrGRAB/uBgr3kVWAvjlasSYVxkKwMhvJogcgOvRY19nHj4Ao79ZIHQAdnti/0mj8AF4cWP/UTsBeGkF4BPIi+sTyCIYi2DboNgG9Q9hGP0dhcBRCIfhMPI7Do3j0P5DDAgABAACAAGAAEAAIAAQAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABBAh9rt1fR4vJ8+xg/VX1/y+TRMz+dHabg3SPeD9WK1O2vpZmMhXa3MC6BL+cXv610+OYSSI5jIIQigAy8XJ72/0Or1+qyKCO62lgVg5DcTCGBG3/zRrjYsfU0wUeOaoDH6mwUizwLVBdCH3Z7/7A7VEEDeHRLAlEW94bmGADIBCEAAAvAJ5BNIABbBFsECsA1qG1QAZgGjvwAchXAUQgBmAiO/AByHdhxaACAAEAAIAAQAAgABgABAACAAEAAIAAQAAgABgABAACAAEAAIAAQAAgABgABAACAAEAAIAAF4EAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAKA0P8rraDjicpgCAAAAAElFTkSuQmCC">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAC5UlEQVR42u3dvUosMRiA4blLL8B7UBAbsbESC+0Eq61tbUQ7QdBGCwVFZbBwF1x/8LeJBFywFnYnme8pnhuYnTeZ5OTE5nJxLkFUjYeAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAFArwK43VxKo4Pd9D5q0/fXGzOQn3V+5vnZC6BD+UfwQnYr/wYC6MD49NALWIj8WwjAyG8mEMBsvvm9cGWqcU3QGP2JPAtUF4DdnrJ3hwQwZV60sglAAAIQgE8gn0ACsAi2CBaAbVDboAIwCxj9BeAohKMQAjATGPkF4Di049ACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAPQ4ANeixLrGRAB/uBgr3kVWAvjlasSYVxkKwMhvJogcgOvRY19nHj4Ao79ZIHQAdnti/0mj8AF4cWP/UTsBeGkF4BPIi+sTyCIYi2DboNgG9Q9hGP0dhcBRCIfhMPI7Do3j0P5DDAgABAACAAGAAEAAIAAQAAIAAYAAQAAgABAACAAEAAIAAYAAQAAgABBAh9rt1fR4vJ8+xg/VX1/y+TRMz+dHabg3SPeD9WK1O2vpZmMhXa3MC6BL+cXv610+OYSSI5jIIQigAy8XJ72/0Or1+qyKCO62lgVg5DcTCGBG3/zRrjYsfU0wUeOaoDH6mwUizwLVBdCH3Z7/7A7VEEDeHRLAlEW94bmGADIBCEAAAvAJ5BNIABbBFsECsA1qG1QAZgGjvwAchXAUQgBmAiO/AByHdhxaACAAEAAIAAQAAgABgABAACAAEAAIAAQAAgABgABAACAAEAAIAAQAAgABgABAACAAEAAIAAF4EAgABAACAAGAAEAAIAAQAAgABAACAAGAAEAAIAAQAAgABAACAAGAAKA0P8rraDjicpgCAAAAAElFTkSuQmCC">
+<script>
+  /* 테마 선택값을 페인트 전에 적용 — 새로고침 때 화면이 번쩍이지 않게 */
+  try {
+    var t = JSON.parse(localStorage.getItem('mlv-theme-v1') || '"system"');
+    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
 <style>
   :root {
     --color-slate-dark: #141413;
@@ -31,10 +47,20 @@
     --muted-strong: var(--color-cloud-dark);
     --accent: var(--color-clay);
     --accent-deep: var(--color-clay-deep);
+
+    /* 회차 구분 톤 — 웜톤 팔레트 안에서 만든 값 (hex 직접 사용 금지 규약에 따라 토큰화) */
+    --round-1-bg: #f2e2d8; --round-1-fg: #a8542e;
+    --round-2-bg: #e6e6d6; --round-2-fg: #5f6b3f;
+    --round-3-bg: #f3e6c8; --round-3-fg: #8a6a1f;
+    --round-4-bg: #ecdccd; --round-4-fg: #6b4423;
+    --round-5-bg: #dbe6e4; --round-5-fg: #3f6b6b;
+
+    --gauge-track: rgba(0,0,0,0.08);
   }
 
-  :root:not([data-theme="light"]) {
-    @media (prefers-color-scheme: dark) {
+  /* 다크 팔레트 — 중첩 문법을 쓰지 않아 구형 브라우저(삼성 인터넷 포함)에서도 적용된다 */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
       --bg: #141413;
       --card: #1c1b19;
       --feature: #2b241c;
@@ -45,6 +71,12 @@
       --muted-strong: #a8a69f;
       --accent: #d97757;
       --accent-deep: #e8916f;
+      --round-1-bg: #3a2a22; --round-1-fg: #e2a184;
+      --round-2-bg: #2c3126; --round-2-fg: #b9c79a;
+      --round-3-bg: #3a2f1c; --round-3-fg: #dcc07f;
+      --round-4-bg: #33261c; --round-4-fg: #d9a878;
+      --round-5-bg: #22302f; --round-5-fg: #8fc0bc;
+      --gauge-track: rgba(255,255,255,0.12);
     }
   }
   :root[data-theme="dark"] {
@@ -58,6 +90,12 @@
     --muted-strong: #a8a69f;
     --accent: #d97757;
     --accent-deep: #e8916f;
+    --round-1-bg: #3a2a22; --round-1-fg: #e2a184;
+    --round-2-bg: #2c3126; --round-2-fg: #b9c79a;
+    --round-3-bg: #3a2f1c; --round-3-fg: #dcc07f;
+    --round-4-bg: #33261c; --round-4-fg: #d9a878;
+    --round-5-bg: #22302f; --round-5-fg: #8fc0bc;
+    --gauge-track: rgba(255,255,255,0.12);
   }
 
   * { box-sizing: border-box; }
@@ -127,6 +165,27 @@
     font-size: 24px;
     margin-left: 6px;
     color: var(--muted-strong);
+  }
+
+  .hero-meta {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--muted-strong);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .hero-meta b { color: var(--text); font-weight: 600; }
+
+  .warn-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--accent);
+    color: #fff;
   }
 
   .hero-breakdown {
@@ -312,6 +371,7 @@
     gap: 12px;
     flex-wrap: wrap;
   }
+  .footer-left { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
 
   .reset-link {
     background: none;
@@ -461,6 +521,16 @@
   .cal-d-sun { color: var(--accent-deep); }
   .cal-d-sat { color: var(--muted); }
 
+  /* 오늘 / 지나간 날 */
+  .cal-day.is-past { opacity: .4; }
+  .cal-day.is-today {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    font-weight: 700;
+  }
+  body.record-mode .cal-day.can-record { cursor: pointer; }
+  body.record-mode .cal-day.can-record:hover { outline: 2px dashed var(--muted-strong); outline-offset: -2px; }
+
   .cal-schedule {
     background: var(--card);
     border: 1px solid var(--border);
@@ -493,6 +563,14 @@
     white-space: nowrap;
     flex-shrink: 0;
   }
+  .cal-schedule-item.is-done { opacity: .45; }
+  .cal-schedule-item .now-tag {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent-deep);
+    white-space: nowrap;
+  }
 
   .cal-legend {
     display: flex;
@@ -523,13 +601,14 @@
     background: var(--feature);
     border-radius: 24px;
     padding: 20px 24px;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
   }
   .dday-top {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     margin-bottom: 10px;
+    gap: 12px;
   }
   .dday-label {
     font-family: var(--font-sans);
@@ -542,10 +621,11 @@
     font-size: 32px;
     font-weight: 600;
     color: var(--accent-deep);
+    white-space: nowrap;
   }
   .dday-gauge-track {
     height: 8px;
-    background: rgba(0,0,0,0.08);
+    background: var(--gauge-track);
     border-radius: 4px;
     overflow: hidden;
   }
@@ -560,6 +640,113 @@
     font-size: 12px;
     color: var(--muted-strong);
   }
+
+  /* ---- 전역(복무) 게이지 ---- */
+  .service-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 18px 24px;
+    margin-bottom: 24px;
+  }
+
+  /* ---- 전투휴무증 ---- */
+  .combat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 18px 20px;
+    margin-top: 16px;
+  }
+  .combat-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    gap: 12px;
+  }
+  .combat-title { font-family: var(--font-serif); font-size: 16px; font-weight: 600; }
+  .combat-count { font-size: 13px; color: var(--muted-strong); }
+  .combat-count b { color: var(--text); font-weight: 700; font-size: 16px; }
+  .combat-note { font-size: 12px; color: var(--muted-strong); margin: 10px 0 12px; line-height: 1.5; }
+  .combat-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .chip button {
+    background: none; border: none; padding: 0;
+    color: var(--muted); cursor: pointer; font-size: 12px;
+    font-family: var(--font-sans);
+  }
+  .chip button:hover { color: var(--accent-deep); }
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px 8px 0 8px;
+    padding: 7px 14px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-outline:hover { border-color: var(--muted-strong); }
+  .btn-outline.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ---- 컴팩트(위젯) 뷰 ---- */
+  body.compact-mode .wrap { max-width: 420px; padding: 20px 18px 24px; }
+  body.compact-mode header,
+  body.compact-mode .view-tabs,
+  body.compact-mode #ddayCard,
+  body.compact-mode #serviceCard,
+  body.compact-mode .view { display: none !important; }
+  body.compact-mode #viewCompact { display: block !important; }
+  #viewCompact { display: none; }
+  .compact-card {
+    background: var(--feature);
+    border-radius: 24px;
+    padding: 22px 24px 20px;
+  }
+  .compact-label { font-size: 13px; color: var(--muted-strong); font-weight: 500; }
+  .compact-num {
+    font-family: var(--font-serif);
+    font-size: 64px;
+    line-height: 1.05;
+    font-weight: 600;
+    color: var(--accent-deep);
+    margin: 2px 0 12px;
+  }
+  .compact-sub { margin-top: 10px; font-size: 12px; color: var(--muted-strong); }
+  .compact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .compact-cell {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 10px 6px;
+    text-align: center;
+  }
+  .compact-cell .n { font-family: var(--font-serif); font-size: 18px; font-weight: 600; }
+  .compact-cell .l { font-size: 10px; color: var(--muted-strong); margin-top: 2px; }
+  .compact-exit {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: underline;
+  }
 </style>
 </head>
 <body>
@@ -571,18 +758,27 @@
     <p class="sub">보유한 휴가·포상·위로·청원 휴가를 항목별로 적어두고, 숫자를 바꾸면 합계가 바로 따라옵니다.</p>
   </header>
 
-  <div class="dday-card">
+  <div class="dday-card" id="ddayCard">
     <div class="dday-top">
-      <span class="dday-label">10/19 첫 휴가까지</span>
+      <span class="dday-label" id="ddayLabel">다음 휴가까지</span>
       <span class="dday-num" id="ddayNum">D-–</span>
     </div>
     <div class="dday-gauge-track"><div class="dday-gauge-fill" id="ddayFill" style="width:0%"></div></div>
     <div class="dday-caption" id="ddayCaption"></div>
   </div>
 
+  <div class="service-card" id="serviceCard">
+    <div class="dday-top">
+      <span class="dday-label">전역까지</span>
+      <span class="dday-num" id="svcNum">D-–</span>
+    </div>
+    <div class="dday-gauge-track"><div class="dday-gauge-fill" id="svcFill" style="width:0%"></div></div>
+    <div class="dday-caption" id="svcCaption"></div>
+  </div>
+
   <div class="view-tabs">
-    <button class="view-tab active" id="tabLedger" onclick="showView('ledger')">대장</button>
-    <button class="view-tab" id="tabCalendar" onclick="showView('calendar')">달력</button>
+    <button class="view-tab active" id="tabLedger" data-view="ledger">대장</button>
+    <button class="view-tab" id="tabCalendar" data-view="calendar">달력</button>
   </div>
 
   <section id="viewLedger" class="view active">
@@ -590,6 +786,7 @@
   <div class="hero">
     <div>
       <div class="hero-num" id="grandTotal">0<span>일</span></div>
+      <div class="hero-meta" id="heroMeta"></div>
     </div>
     <div class="hero-breakdown" id="groupTotals"></div>
   </div>
@@ -609,7 +806,11 @@
   </div>
 
   <footer>
-    <button class="reset-link" id="resetBtn">기본값으로 초기화</button>
+    <div class="footer-left">
+      <button class="reset-link" id="resetBtn">기본값으로 초기화</button>
+      <button class="reset-link" id="themeBtn">테마: 시스템</button>
+      <a class="reset-link" id="compactLink" href="?view=compact">위젯 화면</a>
+    </div>
     <span class="saved-note" id="savedNote"></span>
   </footer>
 
@@ -620,14 +821,143 @@
 
     <div class="cal-tabs" id="calTabs"></div>
     <div id="calPlans"></div>
+    <div id="combatCard"></div>
+  </section>
+
+  <section id="viewCompact">
+    <div class="compact-card">
+      <div class="compact-label" id="cpLabel">다음 휴가까지</div>
+      <div class="compact-num" id="cpNum">D-–</div>
+      <div class="dday-gauge-track"><div class="dday-gauge-fill" id="cpFill" style="width:0%"></div></div>
+      <div class="compact-sub" id="cpSub"></div>
+      <div class="compact-grid">
+        <div class="compact-cell"><div class="n" id="cpLeft">–</div><div class="l">잔여 휴가</div></div>
+        <div class="compact-cell"><div class="n" id="cpDischarge">–</div><div class="l">전역</div></div>
+        <div class="compact-cell"><div class="n" id="cpService">–</div><div class="l">복무 진행</div></div>
+      </div>
+    </div>
+    <a class="compact-exit" href="?">전체 화면 보기</a>
   </section>
 
 </div>
 
 <script>
 (function () {
-  const STORE_KEY = 'leave-ledger-v2';
+  'use strict';
 
+  /* =====================================================================
+     0. 원본 데이터 · 공통 상수
+     화면에 나오는 모든 수치는 이 블록에서 계산해서 만든다.
+     요약값을 손으로 따로 적지 않는다 (CLAUDE.md L1).
+     ===================================================================== */
+  const YEAR = 2026;
+  const MS_DAY = 86400000;
+  const ENLIST = new Date(2025, 5, 17);     // 입대 2025-06-17
+  const DISCHARGE = new Date(2026, 11, 16); // 전역 2026-12-16
+  const FIRST_ANCHOR = new Date(2026, 7, 31); // 1회차 게이지 기준 시작점 (8/31)
+  const COMBAT_TOTAL = 13;                  // 보유 전투휴무증
+
+  // 훈련 5개 구간 (커버 여부를 자동 집계하기 위해 구간 단위로 관리)
+  const trainingBlocks = [
+    ['10-19','10-20','10-21','10-22'],
+    ['10-26','10-27','10-28','10-29'],
+    ['11-16','11-17','11-18','11-19'],
+    ['11-23','11-24','11-25','11-26'],
+    ['11-30','12-1','12-2','12-3'],
+  ];
+  const training = new Set(trainingBlocks.flat());
+
+  const plans = {
+    confirmed: {
+      label: '확정 (11+11+12+12)',
+      // combatSet은 확정 일정 기준값(0장)이다. 사용자의 실제 사용 기록은
+      // 아래 userCombat에 따로 쌓이며 이 값은 건드리지 않는다 (L0).
+      combatSet: new Set([]),
+      leaves: {
+        '10-19':1,'10-20':1,'10-21':1,'10-22':1,'10-23':1,'10-24':1,'10-25':1,'10-26':1,'10-27':1,'10-28':1,'10-29':1,
+        '11-2':2,'11-3':2,'11-4':2,'11-5':2,'11-6':2,'11-7':2,'11-8':2,'11-9':2,'11-10':2,'11-11':2,'11-12':2,
+        '11-15':3,'11-16':3,'11-17':3,'11-18':3,'11-19':3,'11-20':3,'11-21':3,'11-22':3,'11-23':3,'11-24':3,'11-25':3,'11-26':3,
+        '11-30':4,'12-1':4,'12-2':4,'12-3':4,'12-4':4,'12-5':4,'12-6':4,'12-7':4,'12-8':4,'12-9':4,'12-10':4,'12-11':4,
+      },
+      showMonths: [10, 11, 12],
+    },
+  };
+  const planOrder = ['confirmed'];
+  const ACTIVE_PLAN = planOrder[0];
+
+  const DOW = '일월화수목금토';
+  function monthDays(m) { return new Date(YEAR, m, 0).getDate(); }
+  function monthName(m) { return m + '월'; }
+
+  /* ---------- 날짜 유틸 ---------- */
+  function zero(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function keyToDate(k) { const p = k.split('-').map(Number); return new Date(YEAR, p[0] - 1, p[1]); }
+  function dayDiff(from, to) { return Math.round((zero(to) - zero(from)) / MS_DAY); }
+  function fmt(d) { return (d.getMonth() + 1) + '/' + d.getDate() + '(' + DOW[d.getDay()] + ')'; }
+  function today() { return zero(new Date()); }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  /* ---------- 회차를 leaves에서 파생 (날짜를 따로 적지 않는다) ---------- */
+  function deriveRounds(planId) {
+    const leaves = plans[planId].leaves;
+    const byRound = new Map();
+    Object.keys(leaves).forEach(k => {
+      const r = leaves[k];
+      if (typeof r !== 'number') return;
+      if (!byRound.has(r)) byRound.set(r, []);
+      byRound.get(r).push(keyToDate(k));
+    });
+    return Array.from(byRound.entries()).map(function (e) {
+      const dates = e[1].sort((a, b) => a - b);
+      const start = dates[0];
+      const end = dates[dates.length - 1];
+      return {
+        round: e[0],
+        start: start,
+        end: end,
+        back: new Date(end.getTime() + MS_DAY), // 복귀일 = 마지막 날 다음날
+        days: dates.length,
+      };
+    }).sort((a, b) => a.start - b.start);
+  }
+  const rounds = deriveRounds(ACTIVE_PLAN);
+
+  /* =====================================================================
+     1. 저장소 — 키를 기능별로 분리해서 하나가 깨져도 나머지가 살아남게 한다
+     ===================================================================== */
+  const LEDGER_KEY = 'leave-ledger-v2';   // 대장 (기본값 미변경이므로 버전 유지)
+  const COMBAT_KEY = 'mlv-combat-v1';     // 전투휴무증 사용 기록
+  const THEME_KEY  = 'mlv-theme-v1';      // 테마 선택값
+
+  function readStore(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw === null) return fallback;
+      return JSON.parse(raw);
+    } catch (e) { return fallback; }
+  }
+  function writeStore(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      flashSaved();
+    } catch (e) {
+      // 저장 실패해도 메모리 상태로 계속 동작한다
+    }
+  }
+  let savedTimer = null;
+  function flashSaved() {
+    const note = document.getElementById('savedNote');
+    if (!note) return;
+    note.textContent = '저장됨 · ' + new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    clearTimeout(savedTimer);
+    savedTimer = setTimeout(function () { note.textContent = ''; }, 2500);
+  }
+
+  /* =====================================================================
+     2. 대장 (휴가 집계표)
+     ===================================================================== */
   const DEFAULT_GROUPS = [
     { id: 'annual', title: '연가', items: [
       { id: 'g1', label: '연가', qty: 23 },
@@ -650,101 +980,98 @@
     ]},
   ];
 
-  function load() {
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      if (!raw) return JSON.parse(JSON.stringify(DEFAULT_GROUPS));
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed) || !parsed.length) return JSON.parse(JSON.stringify(DEFAULT_GROUPS));
-      return parsed;
-    } catch (e) {
-      return JSON.parse(JSON.stringify(DEFAULT_GROUPS));
-    }
+  function loadLedger() {
+    const parsed = readStore(LEDGER_KEY, null);
+    if (!Array.isArray(parsed) || !parsed.length) return JSON.parse(JSON.stringify(DEFAULT_GROUPS));
+    return parsed;
   }
 
-  function save(state) {
-    try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(state));
-      const note = document.getElementById('savedNote');
-      note.textContent = '저장됨 · ' + new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-      clearTimeout(save._t);
-      save._t = setTimeout(() => { note.textContent = ''; }, 2500);
-    } catch (e) {
-      // storage unavailable — state still lives in memory for this session
-    }
-  }
-
-  let state = load();
+  let state = loadLedger();
   let uidCounter = 1000;
   function uid() { return 'u' + (uidCounter++); }
 
   const groupsEl = document.getElementById('groups');
   const grandTotalEl = document.getElementById('grandTotal');
   const groupTotalsEl = document.getElementById('groupTotals');
+  const heroMetaEl = document.getElementById('heroMeta');
   const newGroupSel = document.getElementById('newGroup');
 
-  function populateGroupSelect() {
-    newGroupSel.innerHTML = state.map(g => `<option value="${g.id}">${g.title}</option>`).join('');
+  function ledgerTotal() {
+    return state.reduce((s, g) => s + g.items.reduce((t, it) => t + (Number(it.qty) || 0), 0), 0);
   }
 
-  function render() {
+  /* 달력 일정에서 오늘 기준 소진 현황을 뽑는다 (①의 근거 데이터) */
+  function leaveProgress() {
+    const leaves = plans[ACTIVE_PLAN].leaves;
+    const t = today();
+    let used = 0, upcoming = 0;
+    Object.keys(leaves).forEach(function (k) {
+      if (keyToDate(k) <= t) used++; else upcoming++;
+    });
+    return { planned: used + upcoming, used: used, upcoming: upcoming };
+  }
+
+  function renderLedger() {
     let grand = 0;
-    // compute max qty across all items for relative bar widths
     let maxQty = 1;
     state.forEach(g => g.items.forEach(it => { if (it.qty > maxQty) maxQty = it.qty; }));
 
-    groupsEl.innerHTML = state.map(g => {
+    groupsEl.innerHTML = state.map(function (g) {
       const groupTotal = g.items.reduce((s, it) => s + (Number(it.qty) || 0), 0);
       grand += groupTotal;
-      const rows = g.items.map(it => {
+      const rows = g.items.map(function (it) {
         const pct = Math.max(4, Math.round((it.qty / maxQty) * 100));
-        return `
-        <div class="row" data-item="${it.id}" data-group="${g.id}">
-          <div class="row-main">
-            <div class="row-label">${escapeHtml(it.label)}</div>
-            <div class="row-bar-track"><div class="row-bar-fill" style="width:${pct}%"></div></div>
-          </div>
-          <div class="qty">
-            <button data-action="dec">−</button>
-            <input type="number" min="0" value="${it.qty}" data-action="set">
-            <button data-action="inc">+</button>
-          </div>
-          <button class="del" data-action="del" title="삭제">✕</button>
-        </div>`;
+        return '' +
+        '<div class="row" data-item="' + it.id + '" data-group="' + g.id + '">' +
+          '<div class="row-main">' +
+            '<div class="row-label">' + escapeHtml(it.label) + '</div>' +
+            '<div class="row-bar-track"><div class="row-bar-fill" style="width:' + pct + '%"></div></div>' +
+          '</div>' +
+          '<div class="qty">' +
+            '<button data-action="dec">−</button>' +
+            '<input type="number" min="0" value="' + it.qty + '" data-action="set">' +
+            '<button data-action="inc">+</button>' +
+          '</div>' +
+          '<button class="del" data-action="del" title="삭제">✕</button>' +
+        '</div>';
       }).join('');
 
-      return `
-      <div class="group" data-group-id="${g.id}">
-        <div class="group-head">
-          <div class="group-title">${escapeHtml(g.title)}</div>
-          <div class="group-total"><b>${groupTotal}</b>일</div>
-        </div>
-        ${rows}
-      </div>`;
+      return '' +
+      '<div class="group" data-group-id="' + g.id + '">' +
+        '<div class="group-head">' +
+          '<div class="group-title">' + escapeHtml(g.title) + '</div>' +
+          '<div class="group-total"><b>' + groupTotal + '</b>일</div>' +
+        '</div>' + rows +
+      '</div>';
     }).join('');
 
     grandTotalEl.innerHTML = grand + '<span>일</span>';
 
-    groupTotalsEl.innerHTML = state.map(g => {
+    groupTotalsEl.innerHTML = state.map(function (g) {
       const t = g.items.reduce((s, it) => s + (Number(it.qty) || 0), 0);
-      return `<div class="hero-stat"><div class="n">${t}</div><div class="l">${escapeHtml(g.title)}</div></div>`;
+      return '<div class="hero-stat"><div class="n">' + t + '</div><div class="l">' + escapeHtml(g.title) + '</div></div>';
     }).join('');
 
-    populateGroupSelect();
+    // ① 대장 ↔ 달력 연동: 사용/잔여를 leaves 원본에서 계산
+    const p = leaveProgress();
+    const left = grand - p.used;
+    let meta = '보유 <b>' + grand + '일</b> · 사용 <b>' + p.used + '일</b> · 잔여 <b>' + left + '일</b>';
+    if (grand !== p.planned) {
+      // 어느 쪽도 자동으로 고치지 않는다. 어긋난 사실만 표시한다 (L0)
+      const gap = Math.abs(grand - p.planned);
+      meta += ' <span class="warn-badge">달력 배정 ' + p.planned + '일과 ' + gap + '일 차이</span>';
+    }
+    heroMetaEl.innerHTML = meta;
+
+    newGroupSel.innerHTML = state.map(g => '<option value="' + g.id + '">' + escapeHtml(g.title) + '</option>').join('');
   }
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
-  groupsEl.addEventListener('click', (e) => {
+  groupsEl.addEventListener('click', function (e) {
     const row = e.target.closest('.row');
     if (!row) return;
-    const groupId = row.dataset.group;
-    const itemId = row.dataset.item;
-    const group = state.find(g => g.id === groupId);
+    const group = state.find(g => g.id === row.dataset.group);
     if (!group) return;
-    const item = group.items.find(i => i.id === itemId);
+    const item = group.items.find(i => i.id === row.dataset.item);
     if (!item) return;
 
     const action = e.target.dataset.action;
@@ -753,229 +1080,388 @@
     } else if (action === 'dec') {
       item.qty = Math.max(0, (Number(item.qty) || 0) - 1);
     } else if (action === 'del') {
-      group.items = group.items.filter(i => i.id !== itemId);
+      group.items = group.items.filter(i => i.id !== row.dataset.item);
     } else {
       return;
     }
-    save(state);
-    render();
+    writeStore(LEDGER_KEY, state);
+    renderLedger();
   });
 
-  groupsEl.addEventListener('change', (e) => {
+  groupsEl.addEventListener('change', function (e) {
     if (e.target.dataset.action !== 'set') return;
     const row = e.target.closest('.row');
-    const groupId = row.dataset.group;
-    const itemId = row.dataset.item;
-    const group = state.find(g => g.id === groupId);
-    const item = group && group.items.find(i => i.id === itemId);
+    const group = state.find(g => g.id === row.dataset.group);
+    const item = group && group.items.find(i => i.id === row.dataset.item);
     if (!item) return;
     let v = parseInt(e.target.value, 10);
     if (isNaN(v) || v < 0) v = 0;
     item.qty = v;
-    save(state);
-    render();
+    writeStore(LEDGER_KEY, state);
+    renderLedger();
   });
 
-  document.getElementById('addBtn').addEventListener('click', () => {
+  document.getElementById('addBtn').addEventListener('click', function () {
     const labelEl = document.getElementById('newLabel');
     const qtyEl = document.getElementById('newQty');
     const label = labelEl.value.trim();
     const qty = Math.max(0, parseInt(qtyEl.value, 10) || 0);
-    const groupId = newGroupSel.value;
     if (!label) { labelEl.focus(); return; }
-    const group = state.find(g => g.id === groupId);
+    const group = state.find(g => g.id === newGroupSel.value);
     if (!group) return;
-    group.items.push({ id: uid(), label, qty });
+    group.items.push({ id: uid(), label: label, qty: qty });
     labelEl.value = '';
     qtyEl.value = 1;
-    save(state);
-    render();
+    writeStore(LEDGER_KEY, state);
+    renderLedger();
   });
 
-  document.getElementById('resetBtn').addEventListener('click', () => {
+  document.getElementById('resetBtn').addEventListener('click', function () {
     state = JSON.parse(JSON.stringify(DEFAULT_GROUPS));
     uidCounter = 1000;
-    save(state);
-    render();
+    writeStore(LEDGER_KEY, state);
+    renderLedger();
   });
 
-  render();
-})();
+  /* =====================================================================
+     3. 전투휴무증 — 확정 데이터(combatSet)는 두고 사용 기록만 따로 쌓는다
+     ===================================================================== */
+  let userCombat = new Set((function () {
+    const v = readStore(COMBAT_KEY, []);
+    return Array.isArray(v) ? v.filter(x => typeof x === 'string') : [];
+  })());
+  let recordMode = false;
 
-(function () {
-  const TARGET = new Date(2026, 9, 19); // 10/19 (month은 0-index)
-  const ANCHOR = new Date(2026, 7, 31); // 8/31 — 게이지 기준 시작점
-  const MS_DAY = 86400000;
-
-  function zero(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
-
-  function update() {
-    const now = zero(new Date());
-    const t = zero(TARGET);
-    const a = zero(ANCHOR);
-
-    const diffDays = Math.round((t - now) / MS_DAY);
-    const totalSpan = Math.round((t - a) / MS_DAY);
-    const elapsed = Math.min(totalSpan, Math.max(0, Math.round((now - a) / MS_DAY)));
-    const pct = totalSpan > 0 ? Math.min(100, Math.max(0, (elapsed / totalSpan) * 100)) : 100;
-
-    const numEl = document.getElementById('ddayNum');
-    const fillEl = document.getElementById('ddayFill');
-    const capEl = document.getElementById('ddayCaption');
-
-    numEl.textContent = diffDays > 0 ? `D-${diffDays}` : (diffDays === 0 ? 'D-DAY' : `D+${-diffDays}`);
-    fillEl.style.width = pct + '%';
-    capEl.textContent = diffDays > 0
-      ? `8/31부터 ${elapsed}일 경과 · ${Math.round(pct)}%`
-      : '첫 휴가 시작!';
+  function combatUsedSet() {
+    const s = new Set(plans[ACTIVE_PLAN].combatSet);
+    userCombat.forEach(k => s.add(k));
+    return s;
+  }
+  function saveCombat() {
+    writeStore(COMBAT_KEY, Array.from(userCombat));
+  }
+  function toggleCombat(key) {
+    if (userCombat.has(key)) {
+      userCombat.delete(key);
+    } else {
+      if (combatUsedSet().size >= COMBAT_TOTAL) {
+        alert('전투휴무증은 ' + COMBAT_TOTAL + '장까지입니다. 기존 기록을 지운 뒤 추가하세요.');
+        return;
+      }
+      userCombat.add(key);
+    }
+    saveCombat();
+    renderCalendar();
   }
 
-  update();
-  setInterval(update, 60 * 1000);
-})();
+  function renderCombatCard() {
+    const used = combatUsedSet();
+    const left = COMBAT_TOTAL - used.size;
+    const pct = Math.round((used.size / COMBAT_TOTAL) * 100);
+    const sorted = Array.from(used).sort((a, b) => keyToDate(a) - keyToDate(b));
 
-function showView(name) {
-  document.getElementById('viewLedger').classList.toggle('active', name === 'ledger');
-  document.getElementById('viewCalendar').classList.toggle('active', name === 'calendar');
-  document.getElementById('tabLedger').classList.toggle('active', name === 'ledger');
-  document.getElementById('tabCalendar').classList.toggle('active', name === 'calendar');
-}
+    const chips = sorted.length
+      ? sorted.map(function (k) {
+          const removable = userCombat.has(k);
+          return '<span class="chip">' + escapeHtml(fmt(keyToDate(k))) +
+            (removable ? '<button data-remove="' + k + '" title="기록 삭제">✕</button>' : '') +
+          '</span>';
+        }).join('')
+      : '<span class="combat-note" style="margin:0">아직 기록된 사용일이 없습니다.</span>';
 
-(function () {
-  // 훈련 5개 구간 (커버 여부를 자동 집계하기 위해 구간 단위로 관리)
-  const trainingBlocks = [
-    ['10-19','10-20','10-21','10-22'],
-    ['10-26','10-27','10-28','10-29'],
-    ['11-16','11-17','11-18','11-19'],
-    ['11-23','11-24','11-25','11-26'],
-    ['11-30','12-1','12-2','12-3'],
-  ];
-  const training = new Set(trainingBlocks.flat());
-  const COMBAT_TOTAL = 13; // 보유 전투휴무증
+    document.getElementById('combatCard').innerHTML = '' +
+      '<div class="combat-card">' +
+        '<div class="combat-head">' +
+          '<div class="combat-title">전투휴무증</div>' +
+          '<div class="combat-count"><b>잔여 ' + left + '장</b> / ' + COMBAT_TOTAL + '장</div>' +
+        '</div>' +
+        '<div class="dday-gauge-track"><div class="dday-gauge-fill" style="width:' + pct + '%"></div></div>' +
+        '<p class="combat-note">확정 일정은 전투휴무증 0장 기준입니다. 실제로 쓴 날을 여기에 기록하면 잔여 장수가 자동으로 줄어듭니다.' +
+          (recordMode ? ' <b>달력에서 날짜를 눌러 기록하세요.</b>' : '') + '</p>' +
+        '<button class="btn-outline' + (recordMode ? ' on' : '') + '" id="recordBtn">' +
+          (recordMode ? '기록 모드 끄기' : '기록 모드 켜기') + '</button>' +
+        '<div class="combat-chips" style="margin-top:12px">' + chips + '</div>' +
+      '</div>';
 
-  const plans = {
-    confirmed: {
-      label: '확정 (11+11+12+12)',
-      schedule: [
-        {r:'1회차', label:'10/19(월)~10/29(목) — 11일'},
-        {r:'2회차', label:'11/2(월)~11/12(목) — 11일'},
-        {r:'3회차', label:'11/15(일)~11/26(목) — 12일'},
-        {r:'4회차', label:'11/30(월)~12/11(금) — 12일'},
-      ],
-      leaves: {
-        '10-19':1,'10-20':1,'10-21':1,'10-22':1,'10-23':1,'10-24':1,'10-25':1,'10-26':1,'10-27':1,'10-28':1,'10-29':1,
-        '11-2':2,'11-3':2,'11-4':2,'11-5':2,'11-6':2,'11-7':2,'11-8':2,'11-9':2,'11-10':2,'11-11':2,'11-12':2,
-        '11-15':3,'11-16':3,'11-17':3,'11-18':3,'11-19':3,'11-20':3,'11-21':3,'11-22':3,'11-23':3,'11-24':3,'11-25':3,'11-26':3,
-        '11-30':4,'12-1':4,'12-2':4,'12-3':4,'12-4':4,'12-5':4,'12-6':4,'12-7':4,'12-8':4,'12-9':4,'12-10':4,'12-11':4,
-      },
-      combatSet: new Set([]),
-      showMonths: [10,11,12],
-    },
-  };
-
-  const planOrder = ['confirmed'];
-
-  const monthDays = {8:31,9:30,10:31,11:30,12:31};
-  const monthNames = {8:'8월',9:'9월',10:'10월',11:'11월',12:'12월'};
-
-  // 회차별 카드 배경/글자색 — 웜톤 팔레트 안에서 5가지로 구분
-  const roundBg = ['', '#f2e2d8', '#e6e6d6', '#f3e6c8', '#ecdccd', '#dbe6e4'];
-  const roundFg = ['', '#a8542e', '#5f6b3f', '#8a6a1f', '#6b4423', '#3f6b6b'];
-
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    document.getElementById('recordBtn').addEventListener('click', function () {
+      recordMode = !recordMode;
+      document.body.classList.toggle('record-mode', recordMode);
+      renderCalendar();
+    });
+    document.querySelectorAll('#combatCard [data-remove]').forEach(function (btn) {
+      btn.addEventListener('click', function () { toggleCombat(btn.dataset.remove); });
+    });
   }
 
-  function buildPlan(planId) {
+  /* =====================================================================
+     4. 달력
+     ===================================================================== */
+  /* 표시할 달 = 일정이 있는 달 + 오늘이 속한 달.
+     오늘이 일정 범위 밖(예: 9월)이어도 "오늘"과 전투휴무증 기록이 화면에 보이게 한다. */
+  function displayMonths(plan) {
+    const months = new Set(plan.showMonths);
+    const t = today();
+    if (t.getFullYear() === YEAR) months.add(t.getMonth() + 1);
+    return Array.from(months).sort((a, b) => a - b);
+  }
+
+  function buildPlanHtml(planId) {
     const plan = plans[planId];
-    const container = document.createElement('div');
-    container.className = 'cal-plan';
-    container.id = planId;
+    const leaves = plan.leaves;
+    const t = today();
+    const combatUsed = combatUsedSet();
 
-    const totalDays = Object.keys(plan.leaves).length;
-    const roundCount = new Set(Object.values(plan.leaves)).size;
-    const combatCount = plan.combatSet.size;
-    const coveredCount = trainingBlocks.filter(b => b.every(d => plan.leaves[d])).length;
+    // 요약 4개 — 전부 원본 데이터에서 계산 (L1)
+    const totalDays = Object.keys(leaves).length;
+    const roundCount = deriveRounds(planId).length;
+    const coveredCount = trainingBlocks.filter(b => b.every(d => leaves[d])).length;
 
-    let html = `<div class="cal-summary">
-      <div class="cal-stat"><div class="cal-stat-num">${totalDays}일</div><div class="cal-stat-label">총 소진</div></div>
-      <div class="cal-stat"><div class="cal-stat-num">${roundCount}회차</div><div class="cal-stat-label">휴가 횟수</div></div>
-      <div class="cal-stat"><div class="cal-stat-num">${combatCount}장</div><div class="cal-stat-label">전투휴무증 (잔여 ${COMBAT_TOTAL - combatCount})</div></div>
-      <div class="cal-stat"><div class="cal-stat-num">${coveredCount}/${trainingBlocks.length}</div><div class="cal-stat-label">훈련커버</div></div>
-    </div>`;
+    let html = '<div class="cal-summary">' +
+      '<div class="cal-stat"><div class="cal-stat-num">' + totalDays + '일</div><div class="cal-stat-label">총 소진</div></div>' +
+      '<div class="cal-stat"><div class="cal-stat-num">' + roundCount + '회차</div><div class="cal-stat-label">휴가 횟수</div></div>' +
+      '<div class="cal-stat"><div class="cal-stat-num">' + combatUsed.size + '장</div><div class="cal-stat-label">전투휴무증 (잔여 ' + (COMBAT_TOTAL - combatUsed.size) + ')</div></div>' +
+      '<div class="cal-stat"><div class="cal-stat-num">' + coveredCount + '/' + trainingBlocks.length + '</div><div class="cal-stat-label">훈련커버</div></div>' +
+    '</div>';
 
     html += '<div class="cal-months">';
-    plan.showMonths.forEach(m => {
-      const days = monthDays[m];
-      html += `<div class="cal-month"><div class="cal-month-title">${monthNames[m]} 2026</div>
-      <div class="cal-days-header">
-        <span class="cal-d-sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
-      </div><div class="cal-days-grid">`;
-      const firstDay = new Date(2026, m - 1, 1).getDay();
+    displayMonths(plan).forEach(function (m) {
+      const days = monthDays(m);
+      html += '<div class="cal-month"><div class="cal-month-title">' + monthName(m) + ' ' + YEAR + '</div>' +
+        '<div class="cal-days-header">' +
+          '<span class="cal-d-sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>' +
+        '</div><div class="cal-days-grid">';
+      const firstDay = new Date(YEAR, m - 1, 1).getDay();
       for (let i = 0; i < firstDay; i++) html += '<div class="cal-day"></div>';
       for (let d = 1; d <= days; d++) {
-        const key = `${m}-${d}`;
-        const dow = new Date(2026, m - 1, d).getDay();
-        const round = plan.leaves[key];
-        const isCombat = plan.combatSet.has(key);
+        const key = m + '-' + d;
+        const date = new Date(YEAR, m - 1, d);
+        const dow = date.getDay();
+        const round = leaves[key];
+        const isCombat = combatUsed.has(key);
         const isTrain = training.has(key);
         const isDischarge = key === '12-16';
-        const isSurvey = round === 's';
-        let style = ''; let cls = 'cal-day';
+        let style = '';
+        let cls = 'cal-day can-record';
+
         if (isDischarge) {
-          style = `background:var(--accent);color:#fff;font-weight:700`;
+          style = 'background:var(--accent);color:#fff;font-weight:700';
         } else if (isCombat) {
-          style = `background:var(--color-slate-dark);color:var(--color-ivory-light);font-weight:600`;
-        } else if (isSurvey) {
-          style = `background:var(--feature);color:var(--text);font-weight:600`;
-        } else if (round) {
-          style = `background:${roundBg[round]};color:${roundFg[round]};font-weight:600`;
+          style = 'background:var(--color-slate-dark);color:var(--color-ivory-light);font-weight:600';
+        } else if (typeof round === 'number') {
+          style = 'background:var(--round-' + round + '-bg);color:var(--round-' + round + '-fg);font-weight:600';
         } else if (isTrain) {
-          style = `background:var(--panel);color:var(--muted-strong);font-weight:600`;
+          style = 'background:var(--panel);color:var(--muted-strong);font-weight:600';
         } else if (dow === 0) { cls += ' cal-d-sun';
         } else if (dow === 6) { cls += ' cal-d-sat'; }
-        html += `<div class="${cls}" style="${style}">${d}</div>`;
+
+        // ③ 오늘 / 지나간 날
+        if (date < t) cls += ' is-past';
+        else if (date.getTime() === t.getTime()) cls += ' is-today';
+
+        html += '<div class="' + cls + '" data-key="' + key + '" style="' + style + '">' + d + '</div>';
       }
       html += '</div></div>';
     });
     html += '</div>';
 
-    html += `<div class="cal-schedule"><div class="cal-schedule-title">일정</div>` +
-      plan.schedule.map(s => {
-        const bg = s.isCombat ? 'var(--color-slate-dark)' : (s.isSurvey ? 'var(--feature)' : 'var(--panel)');
-        const fg = s.isCombat ? 'var(--color-ivory-light)' : 'var(--text)';
-        return `<div class="cal-schedule-item">
-          <span class="cal-badge" style="background:${bg};color:${fg}">${s.r}</span>
-          <span>${escapeHtml(s.label)}</span>
-        </div>`;
+    // 일정 목록도 leaves에서 파생시킨 회차 정보로 그린다 (L1)
+    html += '<div class="cal-schedule"><div class="cal-schedule-title">일정</div>' +
+      deriveRounds(planId).map(function (r) {
+        const done = t > r.end;
+        const now = t >= r.start && t <= r.end;
+        return '<div class="cal-schedule-item' + (done ? ' is-done' : '') + '">' +
+          '<span class="cal-badge" style="background:var(--round-' + r.round + '-bg);color:var(--round-' + r.round + '-fg)">' + r.round + '회차</span>' +
+          '<span>' + fmt(r.start) + '~' + fmt(r.end) + ' — ' + r.days + '일</span>' +
+          (now ? '<span class="now-tag">휴가 중</span>' : (done ? '<span class="now-tag" style="color:var(--muted)">종료</span>' : '')) +
+        '</div>';
       }).join('') + '</div>';
 
-    container.innerHTML = html;
-    document.getElementById('calPlans').appendChild(container);
+    return html;
   }
 
-  function showPlan(id, el) {
-    document.querySelectorAll('.cal-plan').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.cal-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    el.classList.add('active');
+  function renderCalendar() {
+    const host = document.getElementById('calPlans');
+    host.innerHTML = planOrder.map(function (id) {
+      return '<div class="cal-plan" id="' + id + '">' + buildPlanHtml(id) + '</div>';
+    }).join('');
+    // 동적으로 그린 카드에는 초기 활성 상태를 코드로 직접 붙인다 (L1)
+    const first = document.getElementById(planOrder[0]);
+    if (first) first.classList.add('active');
+    renderCombatCard();
   }
+
+  document.getElementById('calPlans').addEventListener('click', function (e) {
+    if (!recordMode) return;
+    const cell = e.target.closest('.cal-day[data-key]');
+    if (!cell) return;
+    toggleCombat(cell.dataset.key);
+  });
 
   const tabsEl = document.getElementById('calTabs');
   if (planOrder.length <= 1) {
     tabsEl.style.display = 'none';
   } else {
-    tabsEl.innerHTML = planOrder.map((id, i) =>
-      `<button class="cal-tab${i === 0 ? ' active' : ''}" data-plan="${id}">${plans[id].label.replace(' (', '<br><small>(').replace(/\)$/, ')</small>')}</button>`
-    ).join('');
-    tabsEl.querySelectorAll('.cal-tab').forEach(btn => {
-      btn.addEventListener('click', () => showPlan(btn.dataset.plan, btn));
+    tabsEl.innerHTML = planOrder.map(function (id, i) {
+      return '<button class="cal-tab' + (i === 0 ? ' active' : '') + '" data-plan="' + id + '">' +
+        plans[id].label.replace(' (', '<br><small>(').replace(/\)$/, ')</small>') + '</button>';
+    }).join('');
+    tabsEl.addEventListener('click', function (e) {
+      const btn = e.target.closest('.cal-tab');
+      if (!btn) return;
+      document.querySelectorAll('.cal-plan').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.cal-tab').forEach(x => x.classList.remove('active'));
+      document.getElementById(btn.dataset.plan).classList.add('active');
+      btn.classList.add('active');
     });
   }
 
-  planOrder.forEach(buildPlan);
-  const firstPlanEl = document.getElementById(planOrder[0]);
-  if (firstPlanEl) firstPlanEl.classList.add('active');
+  /* =====================================================================
+     5. D-Day — 회차 날짜를 하드코딩하지 않고 leaves에서 파생해 자동 전환
+     ===================================================================== */
+  function ddayState() {
+    const t = today();
+    for (let i = 0; i < rounds.length; i++) {
+      const r = rounds[i];
+      if (t < r.start) {
+        const from = i === 0 ? FIRST_ANCHOR : rounds[i - 1].back;
+        return { kind: 'before', label: r.round + '회차 휴가까지', target: r.start, from: from, round: r };
+      }
+      if (t <= r.end) {
+        return { kind: 'during', label: r.round + '회차 복귀까지', target: r.back, from: r.start, round: r };
+      }
+    }
+    const from = rounds.length ? rounds[rounds.length - 1].back : FIRST_ANCHOR;
+    return { kind: 'after', label: '전역까지', target: DISCHARGE, from: from, round: null };
+  }
+
+  function gauge(from, target) {
+    const t = today();
+    const span = dayDiff(from, target);
+    const done = Math.min(span, Math.max(0, dayDiff(from, t)));
+    return span > 0 ? Math.min(100, Math.max(0, (done / span) * 100)) : 100;
+  }
+
+  function ddayText(n) {
+    return n > 0 ? 'D-' + n : (n === 0 ? 'D-DAY' : 'D+' + (-n));
+  }
+
+  function updateDday() {
+    const t = today();
+    const s = ddayState();
+    const diff = dayDiff(t, s.target);
+    const pct = gauge(s.from, s.target);
+
+    document.getElementById('ddayLabel').textContent = s.label;
+    document.getElementById('ddayNum').textContent = ddayText(diff);
+    document.getElementById('ddayFill').style.width = pct + '%';
+
+    let caption;
+    if (s.kind === 'during') {
+      const spent = dayDiff(s.round.start, t) + 1;
+      caption = fmt(s.round.start) + '~' + fmt(s.round.end) + ' · ' + spent + '/' + s.round.days + '일째 · ' +
+        fmt(s.round.back) + ' 복귀';
+    } else if (s.kind === 'before') {
+      caption = fmt(s.from) + '부터 ' + dayDiff(s.from, t) + '일 경과 · ' + Math.round(pct) + '% · ' +
+        fmt(s.target) + ' 시작';
+    } else {
+      caption = '휴가 일정 종료 · ' + fmt(DISCHARGE) + ' 전역';
+    }
+    document.getElementById('ddayCaption').textContent = caption;
+
+    // 전역(복무) 게이지 — 입대 2025/6/17 ~ 전역 2026/12/16
+    const svcTotal = dayDiff(ENLIST, DISCHARGE);
+    const svcDone = Math.min(svcTotal, Math.max(0, dayDiff(ENLIST, t)));
+    const svcPct = svcTotal > 0 ? (svcDone / svcTotal) * 100 : 100;
+    const svcDiff = dayDiff(t, DISCHARGE);
+    document.getElementById('svcNum').textContent = ddayText(svcDiff);
+    document.getElementById('svcFill').style.width = svcPct + '%';
+    document.getElementById('svcCaption').textContent =
+      '복무 ' + (svcDone + 1) + '일차 / 총 ' + (svcTotal + 1) + '일 · ' + svcPct.toFixed(1) + '%' +
+      ' · 입대 ' + fmt(ENLIST);
+
+    // 컴팩트(위젯) 화면
+    const p = leaveProgress();
+    const left = ledgerTotal() - p.used;
+    document.getElementById('cpLabel').textContent = s.label;
+    document.getElementById('cpNum').textContent = ddayText(diff);
+    document.getElementById('cpFill').style.width = pct + '%';
+    document.getElementById('cpSub').textContent = caption;
+    document.getElementById('cpLeft').textContent = left + '일';
+    document.getElementById('cpDischarge').textContent = ddayText(svcDiff);
+    document.getElementById('cpService').textContent = Math.round(svcPct) + '%';
+  }
+
+  /* =====================================================================
+     6. 뷰 전환 · 테마 · 홈 화면 추가
+     ===================================================================== */
+  function showView(name) {
+    document.getElementById('viewLedger').classList.toggle('active', name === 'ledger');
+    document.getElementById('viewCalendar').classList.toggle('active', name === 'calendar');
+    document.getElementById('tabLedger').classList.toggle('active', name === 'ledger');
+    document.getElementById('tabCalendar').classList.toggle('active', name === 'calendar');
+  }
+  document.querySelector('.view-tabs').addEventListener('click', function (e) {
+    const btn = e.target.closest('.view-tab');
+    if (btn) showView(btn.dataset.view);
+  });
+
+  const THEMES = [
+    { id: 'system', label: '시스템' },
+    { id: 'light', label: '밝게' },
+    { id: 'dark', label: '어둡게' },
+  ];
+  let themeId = readStore(THEME_KEY, 'system');
+  if (!THEMES.some(x => x.id === themeId)) themeId = 'system';
+
+  function applyTheme() {
+    if (themeId === 'system') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', themeId);
+    const cur = THEMES.find(x => x.id === themeId);
+    document.getElementById('themeBtn').textContent = '테마: ' + cur.label;
+  }
+  document.getElementById('themeBtn').addEventListener('click', function () {
+    const i = THEMES.findIndex(x => x.id === themeId);
+    themeId = THEMES[(i + 1) % THEMES.length].id;
+    writeStore(THEME_KEY, themeId);
+    applyTheme();
+  });
+
+  // 홈 화면 추가용 manifest — 단일 파일 규약을 지키려고 런타임에 blob으로 만든다.
+  // (data: URI manifest는 start_url이 동일 출처가 아니라서 무시된다)
+  function injectManifest() {
+    if (!/^https?:$/.test(location.protocol)) return; // file:// 에서는 apple-touch-icon으로 충분
+    try {
+      const icon = document.querySelector('link[rel="apple-touch-icon"]').getAttribute('href');
+      const manifest = {
+        name: '말년휴가 대장',
+        short_name: '말년휴가',
+        start_url: location.pathname,
+        scope: location.pathname,
+        display: 'standalone',
+        background_color: '#f0eee6',
+        theme_color: '#f0eee6',
+        icons: [{ src: icon, sizes: '192x192', type: 'image/png', purpose: 'any' }],
+      };
+      const url = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = url;
+      document.head.appendChild(link);
+    } catch (e) {}
+  }
+
+  /* =====================================================================
+     7. 시작
+     ===================================================================== */
+  if (new URLSearchParams(location.search).get('view') === 'compact') {
+    document.body.classList.add('compact-mode');
+  }
+  applyTheme();
+  renderLedger();
+  renderCalendar();
+  updateDday();
+  injectManifest();
+  setInterval(updateDday, 60 * 1000);
 })();
 </script>
 </body>
