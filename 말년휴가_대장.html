@@ -652,6 +652,12 @@
     font-size: 12px;
     color: var(--muted-strong);
   }
+  .dday-workdays {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--muted-strong);
+  }
+  .dday-workdays b { color: var(--text); font-weight: 700; }
 
   /* ---- 전역(복무) 게이지 ---- */
   .service-card {
@@ -975,6 +981,7 @@
     </div>
     <div class="dday-gauge-track"><div class="dday-gauge-fill" id="ddayFill" style="width:0%"></div></div>
     <div class="dday-caption" id="ddayCaption"></div>
+    <div class="dday-workdays">주말·휴가 제외 실근무 <b id="ddayWorkNum">0</b>일</div>
   </div>
 
   <div class="service-card" id="serviceCard">
@@ -984,6 +991,7 @@
     </div>
     <div class="dday-gauge-track"><div class="dday-gauge-fill" id="svcFill" style="width:0%"></div></div>
     <div class="dday-caption" id="svcCaption"></div>
+    <div class="dday-workdays">주말·휴가 제외 실근무 <b id="svcWorkNum">0</b>일</div>
   </div>
 
   <div class="view-tabs">
@@ -1413,6 +1421,7 @@
     }
     saveCombat();
     renderCalendar();
+    updateDday(); // 전투휴무 예정일이 남은 근무일 계산에 들어가므로 같이 갱신한다
   }
 
   function renderCombatCard() {
@@ -1629,6 +1638,28 @@
     return n > 0 ? 'D-' + n : (n === 0 ? 'D-DAY' : 'D+' + (-n));
   }
 
+  /* 남은 근무일 = [from, to) 구간에서 주말 · 확정 4회차 휴가 · 전투휴무 예정일을
+     뺀 날수. today를 포함하고 목표일(to) 당일은 도달 시점이라 제외한다.
+     세 가지 제외 조건 전부 leaves/combatUsedSet 원본에서 그때그때 판정한다(L1) —
+     "근무일 며칠"을 따로 세어서 하드코딩하지 않는다. */
+  function countWorkdays(from, to) {
+    const leaves = plans[ACTIVE_PLAN].leaves;
+    const combatOff = combatUsedSet();
+    let count = 0;
+    let d = zero(from);
+    const end = zero(to);
+    while (d < end) {
+      const key = (d.getMonth() + 1) + '-' + d.getDate();
+      const dow = d.getDay();
+      const isWeekend = dow === 0 || dow === 6;
+      const isLeave = !!leaves[key];
+      const isCombatOff = combatOff.has(key);
+      if (!isWeekend && !isLeave && !isCombatOff) count++;
+      d = new Date(d.getTime() + MS_DAY);
+    }
+    return count;
+  }
+
   function updateDday() {
     const t = today();
     const s = ddayState();
@@ -1655,6 +1686,7 @@
       caption = '휴가 일정 종료 · ' + fmt(DISCHARGE) + ' 전역';
     }
     document.getElementById('ddayCaption').textContent = caption;
+    animateValue(document.getElementById('ddayWorkNum'), countWorkdays(t, s.target), v => Math.round(v), 700);
 
     // 전역(복무) 게이지 — 입대 2025/6/17 ~ 전역 2026/12/16
     const svcTotal = dayDiff(ENLIST, DISCHARGE);
@@ -1669,6 +1701,7 @@
     document.getElementById('svcCaption').textContent =
       '복무 ' + (svcDone + 1) + '일차 / 총 ' + (svcTotal + 1) + '일 · ' + svcPct.toFixed(1) + '%' +
       ' · 입대 ' + fmt(ENLIST);
+    animateValue(document.getElementById('svcWorkNum'), countWorkdays(t, DISCHARGE), v => Math.round(v), 700);
 
     updateCompact(s, t, diff, pct, caption, svcDiff, svcPct, svcDone, svcTotal);
   }
