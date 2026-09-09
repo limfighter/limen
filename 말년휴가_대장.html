@@ -1091,6 +1091,18 @@
   ];
   const training = new Set(trainingBlocks.flat());
 
+  /* 공휴일 — 지금 달력이 보여주는 9~12월 범위만 담았다(그 밖의 달은 검증하지 않았다).
+     추석 9/24(목)~26(토), 개천절 10/3(토)+대체공휴일 10/5(월), 한글날 10/9(금),
+     성탄절 12/25(금) — 2026-09-09 실제 검색으로 대체공휴일 유무까지 확인.
+     9/11 단 창설일은 부대 자체 기념일(사용자 확정, 검증 대상 아님).
+     "남은 실근무일" 계산에도 넣기로 했으므로(사용자 확정) 근무일 판정에서도 이 목록을 쓴다. */
+  const HOLIDAYS = {
+    '9-11': '단 창설일',
+    '9-24': '추석 연휴', '9-25': '추석', '9-26': '추석 연휴',
+    '10-3': '개천절', '10-5': '대체공휴일', '10-9': '한글날',
+    '12-25': '성탄절',
+  };
+
   const plans = {
     confirmed: {
       label: '확정 (11+11+12+12)',
@@ -1533,6 +1545,7 @@
         const isCombat = combatUsed.has(key);
         const isTrain = training.has(key);
         const isDischarge = key === '12-16';
+        const holidayName = HOLIDAYS[key];
         let style = '';
         let cls = 'cal-day can-record';
 
@@ -1542,6 +1555,9 @@
           style = 'background:var(--color-slate-dark);color:var(--color-ivory-light);font-weight:600';
         } else if (typeof round === 'number') {
           style = 'background:var(--round-' + round + '-bg);color:var(--round-' + round + '-fg);font-weight:600';
+        } else if (holidayName) {
+          // 새 색 대신 기존 토큰(hero/dday 카드에 쓰는 feature/accent-deep)을 재사용한다 (L2)
+          style = 'background:var(--feature);color:var(--accent-deep);font-weight:700';
         } else if (isTrain) {
           style = 'background:var(--panel);color:var(--muted-strong);font-weight:600';
         } else if (dow === 0) { cls += ' cal-d-sun';
@@ -1551,7 +1567,8 @@
         if (date < t) cls += ' is-past';
         else if (date.getTime() === t.getTime()) cls += ' is-today';
 
-        html += '<div class="' + cls + '" data-key="' + key + '" style="' + style + '">' + d + '</div>';
+        const titleAttr = holidayName ? ' title="' + escapeHtml(holidayName) + '"' : '';
+        html += '<div class="' + cls + '" data-key="' + key + '" style="' + style + '"' + titleAttr + '>' + d + '</div>';
       }
       html += '</div></div>';
     });
@@ -1638,10 +1655,10 @@
     return n > 0 ? 'D-' + n : (n === 0 ? 'D-DAY' : 'D+' + (-n));
   }
 
-  /* 남은 근무일 = [from, to) 구간에서 주말 · 확정 4회차 휴가 · 전투휴무 예정일을
-     뺀 날수. today를 포함하고 목표일(to) 당일은 도달 시점이라 제외한다.
-     세 가지 제외 조건 전부 leaves/combatUsedSet 원본에서 그때그때 판정한다(L1) —
-     "근무일 며칠"을 따로 세어서 하드코딩하지 않는다. */
+  /* 남은 근무일 = [from, to) 구간에서 주말 · 확정 4회차 휴가 · 전투휴무 예정일 ·
+     공휴일(단 창설일 포함)을 뺀 날수. today를 포함하고 목표일(to) 당일은
+     도달 시점이라 제외한다. 네 가지 제외 조건 전부 leaves/combatUsedSet/HOLIDAYS
+     원본에서 그때그때 판정한다(L1) — "근무일 며칠"을 따로 세어서 하드코딩하지 않는다. */
   function countWorkdays(from, to) {
     const leaves = plans[ACTIVE_PLAN].leaves;
     const combatOff = combatUsedSet();
@@ -1654,7 +1671,8 @@
       const isWeekend = dow === 0 || dow === 6;
       const isLeave = !!leaves[key];
       const isCombatOff = combatOff.has(key);
-      if (!isWeekend && !isLeave && !isCombatOff) count++;
+      const isHoliday = !!HOLIDAYS[key];
+      if (!isWeekend && !isLeave && !isCombatOff && !isHoliday) count++;
       d = new Date(d.getTime() + MS_DAY);
     }
     return count;
