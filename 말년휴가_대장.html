@@ -955,6 +955,23 @@
   .combat-total-edit input:focus { outline: none; color: var(--text); }
 
   /* 접근성: 움직임을 줄이도록 설정한 사용자에게는 전부 즉시 반영으로 */
+  /* ---- 오도미터(자릿수 롤링) 숫자 ---- */
+  .odo-digit {
+    display: inline-block;
+    overflow: hidden;
+    height: 1em;
+    width: 0.62em;
+    vertical-align: -0.08em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .odo-strip {
+    display: block;
+    transition: transform var(--dur-slow) var(--ease-out);
+    will-change: transform;
+  }
+  .odo-d { display: block; height: 1em; line-height: 1em; }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: .001ms !important;
@@ -1145,28 +1162,149 @@
   const REDUCE_MOTION = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const _animPrev = new WeakMap();
   function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
-  function animateValue(el, to, render, duration) {
+  function setPlainText(el, text) { el.textContent = text; }
+  function animateValue(el, to, render, duration, setText) {
     if (!el) return;
     duration = duration || 700;
+    setText = setText || setPlainText;
     const from = _animPrev.has(el) ? _animPrev.get(el) : 0;
     _animPrev.set(el, to);
-    if (REDUCE_MOTION || from === to) { el.textContent = render(to); return; }
+    if (REDUCE_MOTION || from === to) { setText(el, render(to)); return; }
     const start = performance.now();
     (function frame(now) {
       const t = Math.min(1, (now - start) / duration);
       const v = from + (to - from) * easeOutCubic(t);
-      el.textContent = render(t < 1 ? v : to);
+      setText(el, render(t < 1 ? v : to));
       if (t < 1) requestAnimationFrame(frame);
     })(start);
   }
   /* D-Day류 텍스트(D-41 / D-DAY / D+3)는 부호에 따라 형식 자체가 달라져서
      매 프레임 부호를 다시 판정하면 애니메이션 중간에 라벨이 깜빡인다.
-     그래서 라벨(D-/D-DAY/D+)은 최종값 기준으로 한 번만 정하고, 숫자 크기만 센다. */
-  function animateDday(el, diff, duration) {
+     그래서 라벨(D-/D-DAY/D+)은 최종값 기준으로 한 번만 정하고, 숫자 크기만 센다.
+     setText를 넘기면 일반 텍스트 대신 오도미터(자릿수 롤링)로 그릴 수 있다. */
+  function animateDday(el, diff, duration, setText) {
     if (!el) return;
-    if (diff === 0) { _animPrev.set(el, 0); el.textContent = 'D-DAY'; return; }
+    setText = setText || setPlainText;
+    if (diff === 0) { _animPrev.set(el, 0); setText(el, 'D-DAY'); return; }
     const label = diff > 0 ? 'D-' : 'D+';
-    animateValue(el, Math.abs(diff), v => label + Math.round(v), duration);
+    animateValue(el, Math.abs(diff), v => label + Math.round(v), duration, setText);
+  }
+
+  /* ---------- 오도미터: 숫자만 자릿수별로 굴러가는 슬롯으로 그린다 ----------
+     카운트업(0→41 등)이 프레임마다 renderOdoText를 호출하므로, 세는 동안
+     각 자릿수가 실제로 계속 돌아가는 것처럼 보인다. 자릿수 개수가 바뀌는
+     경우(9→10)는 흔치 않아 그때만 통째로 다시 그린다. */
+  function buildOdoDigit() {
+    const wrap = document.createElement('span');
+    wrap.className = 'odo-digit';
+    const strip = document.createElement('span');
+    strip.className = 'odo-strip';
+    for (let i = 0; i <= 9; i++) {
+      const d = document.createElement('span');
+      d.className = 'odo-d';
+      d.textContent = String(i);
+      strip.appendChild(d);
+    }
+    wrap.appendChild(strip);
+    return wrap;
+  }
+  function setOdoDigit(wrap, digit) {
+    wrap.querySelector('.odo-strip').style.transform = 'translateY(-' + (digit * 10) + '%)';
+  }
+  function renderOdoText(el, text) {
+    // 화면엔 각 자릿수 칸에 0~9가 전부 들어있고 그중 하나만 보이도록 클리핑한다.
+    // 이 DOM 텍스트를 그대로 두면 el.textContent/스크린리더가 "D0123456789..."처럼
+    // 안 보이는 숫자까지 전부 읽어버린다 — aria-hidden + aria-label로 분리한다.
+    el.setAttribute('aria-label', text);
+    if (REDUCE_MOTION) { el.textContent = text; el.removeAttribute('aria-label'); return; }
+    const chars = text.split('');
+    const prevShape = el._odoShape || '';
+    const shape = chars.map(c => (/[0-9]/.test(c) ? '9' : c)).join('');
+    if (shape !== prevShape || !el._odoNodes) {
+      el.innerHTML = '';
+      el._odoNodes = chars.map(function (ch) {
+        if (/[0-9]/.test(ch)) {
+          const node = buildOdoDigit();
+          node.setAttribute('aria-hidden', 'true');
+          setOdoDigit(node, +ch);
+          el.appendChild(node);
+          return { digit: true, node };
+        }
+        const node = document.createElement('span');
+        node.setAttribute('aria-hidden', 'true');
+        node.textContent = ch;
+        el.appendChild(node);
+        return { digit: false, node };
+      });
+      el._odoShape = shape;
+      return;
+    }
+    chars.forEach(function (ch, i) {
+      const entry = el._odoNodes[i];
+      if (entry.digit) setOdoDigit(entry.node, +ch);
+      else if (entry.node.textContent !== ch) entry.node.textContent = ch;
+    });
+  }
+
+  /* ---------- D-Day 당일 컨페티 — 정말 중요한 순간에만, 하루 한 번만 터뜨린다 ----------
+     같은 날 안에 새로고침하거나 다시 열어도 또 안 터지도록 날짜를 localStorage에
+     남긴다. 세션 변수(메모리)로만 두면 새로고침할 때마다 다시 터져서
+     "남발하지 말라"는 원칙(전투휴무증 예정일 확인 등으로 자주 들어올 화면이라
+     실제로 여러 번 열어볼 만한 하루다)에 어긋난다. */
+  const CONFETTI_KEY = 'mlv-confetti-shown-v1';
+  function fireConfetti(originEl) {
+    if (REDUCE_MOTION || !originEl) return;
+    const rect = originEl.getBoundingClientRect();
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:2000;';
+    canvas.width = innerWidth; canvas.height = innerHeight;
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    const root = getComputedStyle(document.documentElement);
+    const colors = ['--accent', '--accent-deep', '--round-1-fg', '--round-2-fg', '--round-3-fg', '--round-4-fg']
+      .map(function (v) { return root.getPropertyValue(v).trim(); })
+      .filter(Boolean);
+    const cx = rect.left + rect.width / 2, cy = rect.top + rect.height * 0.3;
+    const particles = Array.from({ length: 90 }, function () {
+      return {
+        x: cx, y: cy,
+        vx: (Math.random() - 0.5) * 16,
+        vy: -Math.random() * 15 - 5,
+        size: 4 + Math.random() * 5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot: Math.random() * Math.PI * 2,
+        vr: (Math.random() - 0.5) * 0.35,
+        life: 1,
+      };
+    });
+    (function tick() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      particles.forEach(function (p) {
+        p.vy += 0.4;
+        p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+        p.life -= 0.011;
+        if (p.life > 0) {
+          alive = true;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.life);
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          ctx.restore();
+        }
+      });
+      if (alive) requestAnimationFrame(tick); else canvas.remove();
+    })();
+  }
+  function maybeFireConfetti(diff) {
+    if (diff !== 0) return;
+    const t = today();
+    const key = t.getFullYear() + '-' + (t.getMonth() + 1) + '-' + t.getDate();
+    if (readStore(CONFETTI_KEY, null) === key) return;
+    writeStore(CONFETTI_KEY, key);
+    fireConfetti(document.getElementById('ddayCard'));
   }
 
   /* ---------- 회차를 leaves에서 파생 (날짜를 따로 적지 않는다) ---------- */
@@ -1686,7 +1824,8 @@
 
     document.getElementById('ddayLabel').textContent = s.label;
     const ddayNumEl = document.getElementById('ddayNum');
-    animateDday(ddayNumEl, diff);
+    animateDday(ddayNumEl, diff, 700, renderOdoText); // 메인 D-Day 숫자만 오도미터로
+    maybeFireConfetti(diff); // D-Day 당일에만, 하루 한 번만
     document.getElementById('ddayFill').style.width = pct + '%';
     // D-Day 당일 하루만 카드/숫자에 은은한 글로우를 준다 (휴가 시작·복귀·전역 전부 해당)
     ddayNumEl.classList.toggle('is-dday-today', diff === 0);
