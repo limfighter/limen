@@ -972,14 +972,9 @@
   }
   .odo-d { display: block; height: 1em; line-height: 1em; }
 
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: .001ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: .001ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
+  /* 개인 전용 단일 사용자 앱이라 prefers-reduced-motion 미디어쿼리는 넣지 않는다 —
+     이 앱의 눈 호강용 효과는 폰의 동작 감소 설정과 무관하게 항상 켠다
+     (2026-09-09 사용자 확정). JS의 REDUCE_MOTION도 같은 이유로 false 고정. */
 </style>
 </head>
 <body>
@@ -1159,7 +1154,10 @@
      최초 렌더는 0에서 시작해 올라간다(카운트업 연출), 이후 값이 바뀔 때는
      이전에 표시했던 값에서 이어서 움직인다. 같은 값으로 다시 그려질 때(예:
      1분마다 도는 D-Day 갱신에서 날짜가 안 바뀐 경우)는 애니메이션을 건너뛴다. */
-  const REDUCE_MOTION = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  // 개인 전용 단일 사용자 앱이라, 폰의 "동작 감소" 시스템 설정과 무관하게
+  // 이 앱 안의 눈 호강용 효과(오도미터·컨페티·카드 진입)는 항상 켠다
+  // (2026-09-09 사용자 확정 — 다른 앱들은 여전히 동작 감소 설정을 따른다).
+  const REDUCE_MOTION = false;
   const _animPrev = new WeakMap();
   function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
   function setPlainText(el, text) { el.textContent = text; }
