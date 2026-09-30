@@ -264,6 +264,9 @@
     font-family: var(--font-serif);
     font-size: 18px;
   }
+  .row-meta { margin-top: 2px; font-size: 12px; color: var(--muted-strong); }
+  .row-meta b { color: var(--text); font-weight: 600; }
+  .row-meta.over, .row-meta.over b { color: var(--accent-deep); }
 
   .row-bar-track {
     height: 4px;
@@ -543,6 +546,13 @@
   body.record-mode .cal-day.can-record { cursor: pointer; }
   body.record-mode .cal-day.can-record:hover { outline: 2px dashed var(--muted-strong); outline-offset: -2px; }
 
+  /* 휴가 종류 배정 — 칸 안에 항목 이름을 작게 붙이고, 배정 모드에서는 아직 안 고른 휴가일을 점선으로 표시 */
+  .cal-day.has-lbl { flex-direction: column; gap: 1px; padding: 3px 2px; }
+  .cal-day .dn { line-height: 1.1; }
+  .cal-day .lbl { font-size: 9px; font-weight: 600; line-height: 1.1; opacity: .85; white-space: nowrap; }
+  body.assign-mode .cal-day.assignable { cursor: pointer; }
+  .cal-day.unassigned:not(.is-today) { outline: 1.5px dashed var(--muted-strong); outline-offset: -2px; }
+
   .cal-schedule {
     background: var(--card);
     border: 1px solid var(--border);
@@ -705,6 +715,62 @@
     font-family: var(--font-sans);
   }
   .chip button:hover { color: var(--accent-deep); }
+  .assign-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 18px 20px;
+    margin-top: 16px;
+  }
+  /* chip은 입장 애니메이션이 있어 탭할 때마다 다시 그리면 깜빡이므로, 배정 집계는 애니메이션 없는 별도 클래스를 쓴다 */
+  .tally {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .tally b { font-weight: 700; }
+
+  .assign-bar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 900;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  }
+  .assign-bar[hidden] { display: none; }
+  .brush-hint { font-size: 12px; color: var(--accent-deep); font-weight: 600; margin: 0 4px 8px; }
+  .brush-line { display: flex; align-items: center; gap: 8px; }
+  .brush-row { display: flex; gap: 6px; overflow-x: auto; flex: 1; min-width: 0; scrollbar-width: none; }
+  .brush-row::-webkit-scrollbar { display: none; }
+  .brush {
+    flex: 0 0 auto;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .brush small { display: block; font-size: 10px; font-weight: 500; color: var(--muted-strong); margin-top: 1px; }
+  .brush.on { background: var(--accent); border-color: var(--accent); color: var(--color-ivory-light); }
+  .brush.on small { color: var(--color-ivory-light); }
+  .brush.over small { color: var(--accent-deep); font-weight: 700; }
+  .brush.on.over small { color: var(--color-ivory-light); }
+  body.assign-mode .wrap { padding-bottom: 170px; } /* 하단 바에 마지막 카드가 가리지 않게 */
+  body.compact-mode .assign-bar { display: none !important; }
+
   .btn-outline {
     background: transparent;
     color: var(--text);
@@ -1047,12 +1113,15 @@
   </section>
 
   <section id="viewCalendar" class="view">
-    <p class="cal-subtitle">2026년 · 전역일 12/16(수) · 확정 46일</p>
+    <p class="cal-subtitle" id="calSubtitle"></p>
 
     <div class="cal-tabs" id="calTabs"></div>
     <div id="calPlans"></div>
+    <div id="assignCard"></div>
     <div id="combatCard"></div>
   </section>
+
+  <div class="assign-bar" id="assignBar" hidden></div>
 
   <section id="viewCompact">
     <div class="compact-card" id="cpCard">
@@ -1118,14 +1187,14 @@
 
   const plans = {
     confirmed: {
-      label: '확정 (11+11+12+12)',
+      label: '확정 (11+11+13+12)',
       // combatSet은 확정 일정 기준값(0장)이다. 사용자의 실제 사용 기록은
       // 아래 userCombat에 따로 쌓이며 이 값은 건드리지 않는다 (L0).
       combatSet: new Set([]),
       leaves: {
         '10-19':1,'10-20':1,'10-21':1,'10-22':1,'10-23':1,'10-24':1,'10-25':1,'10-26':1,'10-27':1,'10-28':1,'10-29':1,
         '11-2':2,'11-3':2,'11-4':2,'11-5':2,'11-6':2,'11-7':2,'11-8':2,'11-9':2,'11-10':2,'11-11':2,'11-12':2,
-        '11-15':3,'11-16':3,'11-17':3,'11-18':3,'11-19':3,'11-20':3,'11-21':3,'11-22':3,'11-23':3,'11-24':3,'11-25':3,'11-26':3,
+        '11-15':3,'11-16':3,'11-17':3,'11-18':3,'11-19':3,'11-20':3,'11-21':3,'11-22':3,'11-23':3,'11-24':3,'11-25':3,'11-26':3,'11-27':3,
         '11-30':4,'12-1':4,'12-2':4,'12-3':4,'12-4':4,'12-5':4,'12-6':4,'12-7':4,'12-8':4,'12-9':4,'12-10':4,'12-11':4,
       },
       showMonths: [10, 11, 12],
@@ -1334,7 +1403,9 @@
   /* =====================================================================
      1. 저장소 — 키를 기능별로 분리해서 하나가 깨져도 나머지가 살아남게 한다
      ===================================================================== */
-  const LEDGER_KEY = 'leave-ledger-v2';   // 대장 (기본값 미변경이므로 버전 유지)
+  const LEDGER_KEY = 'leave-ledger-v3';   // 대장 — 기본값에 '단창설유공'(g12)이 추가돼 v2→v3 (L0)
+  const LEDGER_KEY_V2 = 'leave-ledger-v2'; // 이전 버전: 사용자가 고친 값을 버리지 않고 v3로 옮겨 온다
+  const LEAVE_ASSIGN_KEY = 'mlv-leave-assign-v1'; // 휴가 날짜별 종류 배정(날짜→대장 항목 id)
   const COMBAT_KEY = 'mlv-combat-v1';         // 전투휴무증 사용 기록
   const COMBAT_TOTAL_KEY = 'mlv-combat-total-v1'; // 전투휴무증 보유 총 장수 (사용자 편집)
   const THEME_KEY  = 'mlv-theme-v1';          // 테마 선택값
@@ -1378,6 +1449,7 @@
       { id: 'g6', label: '중대장', qty: 1 },
       { id: 'g7', label: '모범용사(앱개발)', qty: 3 },
       { id: 'g8', label: '드림', qty: 3 },
+      { id: 'g12', label: '단창설유공', qty: 1 },
     ]},
     { id: 'comfort', title: '위로', items: [
       { id: 'g9', label: '종교', qty: 3 },
@@ -1390,13 +1462,35 @@
 
   function loadLedger() {
     const parsed = readStore(LEDGER_KEY, null);
-    if (!Array.isArray(parsed) || !parsed.length) return JSON.parse(JSON.stringify(DEFAULT_GROUPS));
-    return parsed;
+    if (Array.isArray(parsed) && parsed.length) return parsed;
+    // v2에 저장해 둔 값이 있으면 그대로 가져오고, 새로 생긴 '단창설유공'(포상 1일)만 얹는다.
+    // 기본값만 바꾸고 키를 안 올리면 예전 저장값이 새 기본값을 덮어쓰고, 키만 올리면
+    // 사용자가 고친 값이 날아가므로 둘 다 피하는 마이그레이션이다.
+    const old = readStore(LEDGER_KEY_V2, null);
+    if (Array.isArray(old) && old.length) {
+      const migrated = JSON.parse(JSON.stringify(old));
+      const has = migrated.some(g => g.items.some(i => i.id === 'g12'));
+      if (!has) {
+        const reward = migrated.find(g => g.id === 'reward') || migrated[0];
+        reward.items.push({ id: 'g12', label: '단창설유공', qty: 1 });
+      }
+      writeStore(LEDGER_KEY, migrated);
+      return migrated;
+    }
+    return JSON.parse(JSON.stringify(DEFAULT_GROUPS));
   }
 
   let state = loadLedger();
-  let uidCounter = 1000;
-  function uid() { return 'u' + (uidCounter++); }
+  // 배정이 항목 id를 참조하므로 id가 겹치면 안 된다. 새로고침하면 카운터가 1000으로 돌아가
+  // 저장된 u1000과 충돌하던 문제가 있어서, 현재 대장에서 가장 큰 번호 다음 값을 쓴다.
+  function uid() {
+    let max = 999;
+    state.forEach(g => g.items.forEach(function (i) {
+      const m = /^u(\d+)$/.exec(i.id);
+      if (m) max = Math.max(max, Number(m[1]));
+    }));
+    return 'u' + (max + 1);
+  }
 
   const groupsEl = document.getElementById('groups');
   const grandTotalEl = document.getElementById('grandTotal');
@@ -1424,15 +1518,23 @@
     let maxQty = 1;
     state.forEach(g => g.items.forEach(it => { if (it.qty > maxQty) maxQty = it.qty; }));
 
+    const st = assignStats();
     groupsEl.innerHTML = state.map(function (g) {
       const groupTotal = g.items.reduce((s, it) => s + (Number(it.qty) || 0), 0);
       grand += groupTotal;
       const rows = g.items.map(function (it) {
         const pct = Math.max(4, Math.round((it.qty / maxQty) * 100));
+        // 소진=이미 지난(오늘 포함) 배정일, 배정=날짜에 이 항목을 붙인 전체, 잔여=보유−배정.
+        // 셋 다 leaves + 날짜 배정 + 대장에서 매번 계산한다 (L1). 배정이 보유보다 많으면 그대로 음수로 보여준다.
+        const a = st.perItem[it.id] || { assigned: 0, consumed: 0 };
+        const qty = Number(it.qty) || 0;
+        const left = qty - a.assigned;
+        const meta = '<div class="row-meta' + (left < 0 ? ' over' : '') + '">소진 <b>' + a.consumed + '</b> · 배정 <b>' +
+          a.assigned + '</b>/' + qty + ' · 잔여 <b>' + left + '</b></div>';
         return '' +
         '<div class="row" data-item="' + it.id + '" data-group="' + g.id + '">' +
           '<div class="row-main">' +
-            '<div class="row-label">' + escapeHtml(it.label) + '</div>' +
+            '<div class="row-label">' + escapeHtml(it.label) + '</div>' + meta +
             '<div class="row-bar-track"><div class="row-bar-fill" style="width:' + pct + '%"></div></div>' +
           '</div>' +
           '<div class="qty">' +
@@ -1469,6 +1571,7 @@
       const gap = Math.abs(grand - p.planned);
       meta += ' <span class="warn-badge">달력 배정 ' + p.planned + '일과 ' + gap + '일 차이</span>';
     }
+    if (st.unassigned > 0) meta += ' · 종류 미배정 <b>' + st.unassigned + '일</b>';
     heroMetaEl.innerHTML = meta;
 
     newGroupSel.innerHTML = state.map(g => '<option value="' + g.id + '">' + escapeHtml(g.title) + '</option>').join('');
@@ -1489,6 +1592,8 @@
       item.qty = Math.max(0, (Number(item.qty) || 0) - 1);
     } else if (action === 'del') {
       group.items = group.items.filter(i => i.id !== row.dataset.item);
+      pruneAssignments(); // 지운 항목을 가리키던 날짜 배정도 같이 비운다
+      renderCalendar();
     } else {
       return;
     }
@@ -1526,8 +1631,9 @@
 
   document.getElementById('resetBtn').addEventListener('click', function () {
     state = JSON.parse(JSON.stringify(DEFAULT_GROUPS));
-    uidCounter = 1000;
     writeStore(LEDGER_KEY, state);
+    pruneAssignments();
+    renderCalendar();
     renderLedger();
   });
 
@@ -1614,6 +1720,12 @@
     document.getElementById('recordBtn').addEventListener('click', function () {
       recordMode = !recordMode;
       document.body.classList.toggle('record-mode', recordMode);
+      if (recordMode && assignMode) { // 같은 날짜 칸을 누르는 모드라 동시에 켜지 않는다
+        assignMode = false;
+        assignBrush = null;
+        document.body.classList.remove('assign-mode');
+        renderAssignBar();
+      }
       renderCalendar();
     });
     document.querySelectorAll('#combatCard [data-total]').forEach(function (btn) {
@@ -1636,6 +1748,133 @@
   }
 
   /* =====================================================================
+     3b. 휴가 종류 배정 — 휴가 날짜마다 대장의 어느 항목(연가·운전·…)을 썼는지 표시한다.
+     원본으로 저장하는 건 "날짜→대장 항목 id" 매핑 하나뿐이고, 항목별 소진·배정·잔여와
+     미배정 일수는 전부 leaves + 이 매핑 + 대장에서 그때그때 계산한다 (L1).
+     ===================================================================== */
+  const ASSIGN_CLEAR = '__clear__';
+  let leaveAssign = (function () {
+    const v = readStore(LEAVE_ASSIGN_KEY, {});
+    const out = {};
+    if (v && typeof v === 'object' && !Array.isArray(v)) {
+      Object.keys(v).forEach(function (k) { if (typeof v[k] === 'string') out[k] = v[k]; });
+    }
+    return out;
+  })();
+  let assignMode = false;
+  let assignBrush = null;
+
+  function saveAssign() { writeStore(LEAVE_ASSIGN_KEY, leaveAssign); }
+
+  function ledgerItems() {
+    const out = [];
+    state.forEach(g => g.items.forEach(i => out.push({ id: i.id, label: i.label, qty: Number(i.qty) || 0, group: g.title })));
+    return out;
+  }
+  function ledgerItemById(id) { return ledgerItems().find(i => i.id === id) || null; }
+  // 달력 칸이 좁아서 3글자까지는 그대로, 더 길면 앞 2글자만 쓴다 (전체 이름은 title로 본다)
+  function shortLabel(label) { const t = String(label); return t.length <= 3 ? t : t.slice(0, 2); }
+
+  // 휴가가 아닌 날·없어진 항목을 가리키는 배정은 버린다 (항목 삭제/초기화/일정 변경 뒤에 호출)
+  function pruneAssignments() {
+    const leaves = plans[ACTIVE_PLAN].leaves;
+    const ids = new Set(ledgerItems().map(i => i.id));
+    let changed = false;
+    Object.keys(leaveAssign).forEach(function (k) {
+      if (!leaves[k] || !ids.has(leaveAssign[k])) { delete leaveAssign[k]; changed = true; }
+    });
+    if (changed) saveAssign();
+  }
+  pruneAssignments();
+
+  function assignStats() {
+    const leaves = plans[ACTIVE_PLAN].leaves;
+    const t = today();
+    const perItem = {};
+    let assigned = 0, unassigned = 0;
+    Object.keys(leaves).forEach(function (k) {
+      const id = leaveAssign[k];
+      if (!id) { unassigned++; return; }
+      assigned++;
+      const a = perItem[id] || (perItem[id] = { assigned: 0, consumed: 0 });
+      a.assigned++;
+      if (keyToDate(k) <= t) a.consumed++;
+    });
+    return { perItem: perItem, assigned: assigned, unassigned: unassigned, total: assigned + unassigned };
+  }
+
+  function setAssignMode(on) {
+    assignMode = on;
+    if (!on) assignBrush = null;
+    if (on && recordMode) { // 전투휴무 기록 모드와는 동시에 켜지 않는다 — 같은 날짜 칸을 누르기 때문
+      recordMode = false;
+      document.body.classList.remove('record-mode');
+    }
+    document.body.classList.toggle('assign-mode', on);
+    renderCalendar();
+    renderAssignBar();
+  }
+
+  function applyBrush(key) {
+    if (!plans[ACTIVE_PLAN].leaves[key] || !assignBrush) return;
+    if (assignBrush === ASSIGN_CLEAR || leaveAssign[key] === assignBrush) delete leaveAssign[key]; // 같은 항목을 다시 누르면 해제
+    else leaveAssign[key] = assignBrush;
+    saveAssign();
+    refreshCell(key);   // 전체를 다시 그리지 않고 눌린 칸만 고쳐서 연속으로 눌러도 깜빡이지 않게 한다
+    renderLedger();
+    renderAssignCard();
+    renderAssignBar();
+  }
+
+  function renderAssignCard() {
+    const host = document.getElementById('assignCard');
+    const st = assignStats();
+    const tallies = ledgerItems().filter(i => st.perItem[i.id]).map(function (i) {
+      const a = st.perItem[i.id];
+      return '<span class="tally">' + escapeHtml(i.label) + ' <b>' + a.assigned + '</b>' + (a.consumed ? ' · 소진 ' + a.consumed : '') + '</span>';
+    }).join('');
+    host.innerHTML = '' +
+      '<div class="assign-card">' +
+        '<div class="combat-head">' +
+          '<div class="combat-title">휴가 종류 배정</div>' +
+          '<div class="combat-count">배정 <b>' + st.assigned + '</b> / ' + st.total + '일 · 미배정 <b>' + st.unassigned + '</b>일</div>' +
+        '</div>' +
+        '<p class="combat-note">휴가 날짜마다 대장의 어느 항목을 썼는지 표시합니다. 배정 모드를 켜고 아래 바에서 항목을 고른 뒤 달력의 휴가 날짜를 누르세요.' +
+          ' 같은 항목을 다시 누르면 해제됩니다. 항목별 소진·배정·잔여는 대장 탭에서 자동으로 계산됩니다.</p>' +
+        '<button class="btn-outline' + (assignMode ? ' on' : '') + '" id="assignBtn">' + (assignMode ? '배정 모드 끄기' : '배정 모드 켜기') + '</button>' +
+        (tallies ? '<div class="combat-chips" style="margin-top:12px">' + tallies + '</div>' : '') +
+      '</div>';
+    document.getElementById('assignBtn').addEventListener('click', function () { setAssignMode(!assignMode); });
+  }
+
+  function renderAssignBar() {
+    const bar = document.getElementById('assignBar');
+    if (!assignMode) { bar.hidden = true; bar.innerHTML = ''; return; }
+    const prevRow = bar.querySelector('.brush-row');
+    const prevScroll = prevRow ? prevRow.scrollLeft : 0;
+    const st = assignStats();
+    const brushes = ['<button class="brush' + (assignBrush === ASSIGN_CLEAR ? ' on' : '') + '" data-brush="' + ASSIGN_CLEAR + '">지우개<small>배정 해제</small></button>']
+      .concat(ledgerItems().map(function (it) {
+        const used = (st.perItem[it.id] || {}).assigned || 0;
+        const left = it.qty - used;
+        return '<button class="brush' + (assignBrush === it.id ? ' on' : '') + (left < 0 ? ' over' : '') + '" data-brush="' + escapeHtml(it.id) + '">' +
+          escapeHtml(it.label) + '<small>잔여 ' + left + '</small></button>';
+      })).join('');
+    bar.innerHTML = '' +
+      (assignBrush ? '' : '<div class="brush-hint">항목을 고른 뒤 달력의 휴가 날짜를 누르세요</div>') +
+      '<div class="brush-line"><div class="brush-row">' + brushes + '</div><button class="btn-clay" id="assignDoneBtn">완료</button></div>';
+    bar.hidden = false;
+    bar.querySelector('.brush-row').scrollLeft = prevScroll;
+  }
+  document.getElementById('assignBar').addEventListener('click', function (e) {
+    if (e.target.closest('#assignDoneBtn')) { setAssignMode(false); return; }
+    const b = e.target.closest('.brush');
+    if (!b) return;
+    assignBrush = b.dataset.brush;
+    renderAssignBar();
+  });
+
+  /* =====================================================================
      4. 달력
      ===================================================================== */
   /* 표시할 달 = 일정이 있는 달 + 오늘이 속한 달.
@@ -1645,6 +1884,64 @@
     const t = today();
     if (t.getFullYear() === YEAR) months.add(t.getMonth() + 1);
     return Array.from(months).sort((a, b) => a - b);
+  }
+
+  /* 달력 한 칸 — 휴가/전투휴무/공휴일/훈련 스타일에 더해, 휴가 날짜에 배정한 항목 이름을 작게 붙인다.
+     한 칸만 다시 그릴 수 있게(refreshCell) 함수로 뺐다. */
+  function dayCellHtml(m, d, leaves, combatUsed, t) {
+    const key = m + '-' + d;
+    const date = new Date(YEAR, m - 1, d);
+    const dow = date.getDay();
+    const round = leaves[key];
+    const isCombat = combatUsed.has(key);
+    const isTrain = training.has(key);
+    const isDischarge = key === '12-16';
+    const holidayName = HOLIDAYS[key];
+    let style = '';
+    let cls = 'cal-day can-record';
+    let inner = String(d);
+    let titleText = holidayName || '';
+
+    if (isDischarge) {
+      style = 'background:var(--accent);color:var(--color-ivory-light);font-weight:700';
+    } else if (isCombat) {
+      style = 'background:var(--color-slate-dark);color:var(--color-ivory-light);font-weight:600';
+    } else if (typeof round === 'number') {
+      style = 'background:var(--round-' + round + '-bg);color:var(--round-' + round + '-fg);font-weight:600';
+    } else if (holidayName) {
+      // 새 색 대신 기존 토큰(hero/dday 카드에 쓰는 feature/accent-deep)을 재사용한다 (L2)
+      style = 'background:var(--feature);color:var(--accent-deep);font-weight:700';
+    } else if (isTrain) {
+      style = 'background:var(--panel);color:var(--muted-strong);font-weight:600';
+    } else if (dow === 0) { cls += ' cal-d-sun';
+    } else if (dow === 6) { cls += ' cal-d-sat'; }
+
+    if (typeof round === 'number') {
+      if (assignMode) cls += ' assignable';
+      const aid = leaveAssign[key];
+      const item = aid ? ledgerItemById(aid) : null;
+      if (item) {
+        cls += ' has-lbl';
+        inner = '<span class="dn">' + d + '</span><span class="lbl">' + escapeHtml(shortLabel(item.label)) + '</span>';
+        titleText = item.label;
+      } else if (assignMode) {
+        cls += ' unassigned';
+      }
+    }
+
+    // ③ 오늘 / 지나간 날
+    if (date < t) cls += ' is-past';
+    else if (date.getTime() === t.getTime()) cls += ' is-today';
+
+    const titleAttr = titleText ? ' title="' + escapeHtml(titleText) + '"' : '';
+    return '<div class="' + cls + '" data-key="' + key + '" style="' + style + '"' + titleAttr + '>' + inner + '</div>';
+  }
+
+  function refreshCell(key) {
+    const cell = document.querySelector('#calPlans .cal-day[data-key="' + key + '"]');
+    if (!cell) return;
+    const parts = key.split('-').map(Number);
+    cell.outerHTML = dayCellHtml(parts[0], parts[1], plans[ACTIVE_PLAN].leaves, combatUsedSet(), today());
   }
 
   function buildPlanHtml(planId) {
@@ -1674,39 +1971,7 @@
         '</div><div class="cal-days-grid">';
       const firstDay = new Date(YEAR, m - 1, 1).getDay();
       for (let i = 0; i < firstDay; i++) html += '<div class="cal-day"></div>';
-      for (let d = 1; d <= days; d++) {
-        const key = m + '-' + d;
-        const date = new Date(YEAR, m - 1, d);
-        const dow = date.getDay();
-        const round = leaves[key];
-        const isCombat = combatUsed.has(key);
-        const isTrain = training.has(key);
-        const isDischarge = key === '12-16';
-        const holidayName = HOLIDAYS[key];
-        let style = '';
-        let cls = 'cal-day can-record';
-
-        if (isDischarge) {
-          style = 'background:var(--accent);color:var(--color-ivory-light);font-weight:700';
-        } else if (isCombat) {
-          style = 'background:var(--color-slate-dark);color:var(--color-ivory-light);font-weight:600';
-        } else if (typeof round === 'number') {
-          style = 'background:var(--round-' + round + '-bg);color:var(--round-' + round + '-fg);font-weight:600';
-        } else if (holidayName) {
-          // 새 색 대신 기존 토큰(hero/dday 카드에 쓰는 feature/accent-deep)을 재사용한다 (L2)
-          style = 'background:var(--feature);color:var(--accent-deep);font-weight:700';
-        } else if (isTrain) {
-          style = 'background:var(--panel);color:var(--muted-strong);font-weight:600';
-        } else if (dow === 0) { cls += ' cal-d-sun';
-        } else if (dow === 6) { cls += ' cal-d-sat'; }
-
-        // ③ 오늘 / 지나간 날
-        if (date < t) cls += ' is-past';
-        else if (date.getTime() === t.getTime()) cls += ' is-today';
-
-        const titleAttr = holidayName ? ' title="' + escapeHtml(holidayName) + '"' : '';
-        html += '<div class="' + cls + '" data-key="' + key + '" style="' + style + '"' + titleAttr + '>' + d + '</div>';
-      }
+      for (let d = 1; d <= days; d++) html += dayCellHtml(m, d, leaves, combatUsed, t);
       html += '</div></div>';
     });
     html += '</div>';
@@ -1734,14 +1999,18 @@
     // 동적으로 그린 카드에는 초기 활성 상태를 코드로 직접 붙인다 (L1)
     const first = document.getElementById(planOrder[0]);
     if (first) first.classList.add('active');
+    // 확정 일수도 leaves에서 센다 — 일정이 바뀔 때마다 손으로 고쳐 적지 않는다 (L1)
+    document.getElementById('calSubtitle').textContent =
+      YEAR + '년 · 전역일 ' + fmt(DISCHARGE) + ' · 확정 ' + Object.keys(plans[ACTIVE_PLAN].leaves).length + '일';
+    renderAssignCard();
     renderCombatCard();
   }
 
   document.getElementById('calPlans').addEventListener('click', function (e) {
-    if (!recordMode) return;
     const cell = e.target.closest('.cal-day[data-key]');
     if (!cell) return;
-    toggleCombat(cell.dataset.key);
+    if (recordMode) { toggleCombat(cell.dataset.key); return; }
+    if (assignMode) applyBrush(cell.dataset.key);
   });
 
   const tabsEl = document.getElementById('calTabs');
