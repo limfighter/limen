@@ -1449,7 +1449,7 @@
       { id: 'g6', label: '중대장', qty: 1 },
       { id: 'g7', label: '모범용사(앱개발)', qty: 3 },
       { id: 'g8', label: '드림', qty: 3 },
-      { id: 'g12', label: '단창설유공', qty: 1 },
+      { id: 'g12', label: '단창설유공 포상', qty: 1 },
     ]},
     { id: 'comfort', title: '위로', items: [
       { id: 'g9', label: '종교', qty: 3 },
@@ -1462,7 +1462,15 @@
 
   function loadLedger() {
     const parsed = readStore(LEDGER_KEY, null);
-    if (Array.isArray(parsed) && parsed.length) return parsed;
+    if (Array.isArray(parsed) && parsed.length) {
+      // 처음 배포 때 이름이 '단창설유공'이었던 저장본만 '단창설유공 포상'으로 바꾼다 (직접 고친 이름은 건드리지 않음)
+      let renamed = false;
+      parsed.forEach(g => g.items.forEach(i => {
+        if (i.id === 'g12' && i.label === '단창설유공') { i.label = '단창설유공 포상'; renamed = true; }
+      }));
+      if (renamed) writeStore(LEDGER_KEY, parsed);
+      return parsed;
+    }
     // v2에 저장해 둔 값이 있으면 그대로 가져오고, 새로 생긴 '단창설유공'(포상 1일)만 얹는다.
     // 기본값만 바꾸고 키를 안 올리면 예전 저장값이 새 기본값을 덮어쓰고, 키만 올리면
     // 사용자가 고친 값이 날아가므로 둘 다 피하는 마이그레이션이다.
@@ -1472,7 +1480,7 @@
       const has = migrated.some(g => g.items.some(i => i.id === 'g12'));
       if (!has) {
         const reward = migrated.find(g => g.id === 'reward') || migrated[0];
-        reward.items.push({ id: 'g12', label: '단창설유공', qty: 1 });
+        reward.items.push({ id: 'g12', label: '단창설유공 포상', qty: 1 });
       }
       writeStore(LEDGER_KEY, migrated);
       return migrated;
