@@ -20,7 +20,7 @@ const COMBAT_TOTAL = 13;
 // 대장 기본값 합계 — 말년휴가_대장.html의 DEFAULT_GROUPS 수량과 동일해야 한다.
 // 서버는 사용자가 앱에서 직접 고친 대장 값(localStorage 전용)을 알 수 없으므로
 // 항상 이 기본 합계를 기준으로 "잔여 휴가"를 계산한다. 이 사실을 leave_left_note로 같이 내려준다.
-const DEFAULT_LEDGER_QTYS = [23, 4, 2, 3, 1, 1, 3, 3, 3, 1, 2, 1]; // 연가/운전/뜀걸음/야근/사격특급/중대장/모범용사/드림/종교/시설방문/구직/단창설유공
+const DEFAULT_LEDGER_QTYS = [23, 4, 2, 3, 1, 1, 3, 3, 3, 1, 2, 1]; // 합계만 쓴다(항목 이름·분류는 HTML이 원본): 연가 23 / 포상 15 / 위로 7 / 청원 2
 const DEFAULT_LEDGER_TOTAL = DEFAULT_LEDGER_QTYS.reduce((a, b) => a + b, 0);
 
 const LEAVES = {
