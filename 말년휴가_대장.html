@@ -1403,8 +1403,9 @@
   /* =====================================================================
      1. 저장소 — 키를 기능별로 분리해서 하나가 깨져도 나머지가 살아남게 한다
      ===================================================================== */
-  const LEDGER_KEY = 'leave-ledger-v3';   // 대장 — 기본값에 '단창설유공'(g12)이 추가돼 v2→v3 (L0)
-  const LEDGER_KEY_V2 = 'leave-ledger-v2'; // 이전 버전: 사용자가 고친 값을 버리지 않고 v3로 옮겨 온다
+  const LEDGER_KEY = 'leave-ledger-v4';   // 대장 — 기본값 분류가 바뀔 때마다 올린다 (v3→v4: 야근·부대유공 위로 / 현충시설방문 포상) (L0)
+  const LEDGER_KEY_V3 = 'leave-ledger-v3'; // 이전 버전들: 사용자가 고친 수량·추가 항목을 버리지 않고 v4로 옮겨 온다
+  const LEDGER_KEY_V2 = 'leave-ledger-v2';
   const LEAVE_ASSIGN_KEY = 'mlv-leave-assign-v1'; // 휴가 날짜별 종류 배정(날짜→대장 항목 id)
   const COMBAT_KEY = 'mlv-combat-v1';         // 전투휴무증 사용 기록
   const COMBAT_TOTAL_KEY = 'mlv-combat-total-v1'; // 전투휴무증 보유 총 장수 (사용자 편집)
@@ -1462,30 +1463,39 @@
 
   function loadLedger() {
     const parsed = readStore(LEDGER_KEY, null);
-    if (Array.isArray(parsed) && parsed.length) {
-      // 처음 배포 때 이름이 '단창설유공'이었던 저장본만 '단창설유공 포상'으로 바꾼다 (직접 고친 이름은 건드리지 않음)
-      let renamed = false;
-      parsed.forEach(g => g.items.forEach(i => {
-        if (i.id === 'g12' && i.label === '단창설유공') { i.label = '단창설유공 포상'; renamed = true; }
-      }));
-      if (renamed) writeStore(LEDGER_KEY, parsed);
-      return parsed;
-    }
-    // v2에 저장해 둔 값이 있으면 그대로 가져오고, 새로 생긴 '단창설유공'(포상 1일)만 얹는다.
+    if (Array.isArray(parsed) && parsed.length) return parsed;
+    // 예전 키(v3 → v2 순)에 저장해 둔 값이 있으면 수량·직접 추가한 항목은 그대로 가져오고,
+    // 기본값에서 바뀐 부분(새 항목, 분류 이동, 이름 변경)만 얹는다.
     // 기본값만 바꾸고 키를 안 올리면 예전 저장값이 새 기본값을 덮어쓰고, 키만 올리면
     // 사용자가 고친 값이 날아가므로 둘 다 피하는 마이그레이션이다.
-    const old = readStore(LEDGER_KEY_V2, null);
+    const old = readStore(LEDGER_KEY_V3, null) || readStore(LEDGER_KEY_V2, null);
     if (Array.isArray(old) && old.length) {
-      const migrated = JSON.parse(JSON.stringify(old));
-      const has = migrated.some(g => g.items.some(i => i.id === 'g12'));
-      if (!has) {
-        const reward = migrated.find(g => g.id === 'reward') || migrated[0];
-        reward.items.push({ id: 'g12', label: '단창설유공 포상', qty: 1 });
-      }
+      const migrated = migrateLedger(JSON.parse(JSON.stringify(old)));
       writeStore(LEDGER_KEY, migrated);
       return migrated;
     }
     return JSON.parse(JSON.stringify(DEFAULT_GROUPS));
+  }
+
+  // 항목 id는 그대로 두고 분류·이름만 옮긴다 — 달력 배정이 id를 참조하기 때문. 이름은 옛 기본 이름 그대로일 때만 바꾼다.
+  function migrateLedger(groups) {
+    const find = id => groups.find(g => g.id === id);
+    const reward = find('reward') || groups[0];
+    const comfort = find('comfort') || groups[0];
+    const all = () => groups.reduce((a, g) => a.concat(g.items), []);
+    if (!all().some(i => i.id === 'g12')) reward.items.push({ id: 'g12', label: '단창설유공 포상', qty: 1 });
+    const rename = (id, from, to) => all().forEach(i => { if (i.id === id && i.label === from) i.label = to; });
+    rename('g12', '단창설유공', '단창설유공 포상');
+    rename('g6', '중대장', '부대유공');
+    rename('g10', '시설방문', '현충시설방문');
+    const move = (id, to) => {
+      groups.forEach(g => {
+        const k = g.items.findIndex(i => i.id === id);
+        if (k >= 0 && g !== to) to.items.push(g.items.splice(k, 1)[0]);
+      });
+    };
+    move('g4', comfort); move('g6', comfort); move('g10', reward);
+    return groups;
   }
 
   let state = loadLedger();
